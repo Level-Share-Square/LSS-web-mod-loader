@@ -6,11 +6,11 @@ const checkForGame = () => {
     // Loop through iframes to find the target game
     const observer = new MutationObserver(() => {
         const iframeWrapper = document.getElementById("game-wrapper");
-        const iframeSrc = iframeWrapper?.firstChild?.src;
-        console.log('Game iframe detected:', iframeSrc);
+        const iframe = iframeWrapper?.firstChild;
+        console.log(iframe)
         chrome.runtime.sendMessage({
             type: 'GAME_DETECTED',
-            iframeSrc: iframeSrc,
+            iframeSrc: iframe,
         });
     });
 
