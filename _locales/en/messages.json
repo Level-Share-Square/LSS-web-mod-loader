@@ -1,0 +1,22 @@
+{
+  "extension_name": {
+    "message": "SMC Mod Loader",
+    "description": "The name of the extension"
+  },
+  "extension_description": {
+    "message": "A mod loader for Super Mario Construct.",
+    "description": "The description of the extension displayed in the browser"
+  },
+  "popup_title": {
+    "message": "Welcome to the Mod Loader!",
+    "description": "The title displayed in the popup"
+  },
+  "button_load_mods": {
+    "message": "Load Mods",
+    "description": "Label for the button that loads mods"
+  },
+  "error_no_mods": {
+    "message": "No mods found in the folder.",
+    "description": "Error message when no mods are available"
+  }
+}
