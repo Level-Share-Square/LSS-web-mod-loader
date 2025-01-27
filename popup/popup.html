@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Texture Replacer</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+	<h1>Texture Replacer</h1>
+	<form id="replacementForm">
+		<label for="fileUploadId">Select a File:</label>
+		<input type="file" id="fileUploadId" accept="image/*">
+		<label for="urlToReplace">URL to Replace:</label>
+		<input type="url" id="urlToReplace" required>
+		<button type="submit">Save</button>
+	</form>
+	<ul id="mappingList"></ul>
+	<script src="popup.js"></script>
+</body>
+
+</html>

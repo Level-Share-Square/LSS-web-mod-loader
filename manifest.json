@@ -3,7 +3,7 @@
   "name": "SMC Mod Loader",
   "version": "1.0",
   "description": "A simple browser extension.",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "scripting", "storage", "declarativeNetRequest", "declarativeNetRequestWithHostAccess"],
   "default_locale": "en",
   "host_permissions": ["<all_urls>"],
   "icons": {
