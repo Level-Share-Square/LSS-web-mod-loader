@@ -18,9 +18,10 @@ chrome.runtime.onMessage.addListener((message) => {
             url: 'popup/main/popup.html', // Path to your popup HTML file
             type: 'popup',
             width: 500,
-            height: Math.round(screen.availHeight * 0.9),
-            top: Math.round(screen.availHeight * 0.1),
+            height: Math.round(screen.height),
+            top: 0,
             left: 0,
+            focused: true
         });
     };
 });

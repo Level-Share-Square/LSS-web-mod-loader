@@ -1,11 +1,12 @@
 let pathname = window.location.pathname;
 let isObserverConnected = true;
 const screenData = {
+    height: screen.height || screen.availHeight || 600,
     availWidth: screen.availWidth || 400,
-    availHeight: screen.availHeight || 600
 }
 
 const trigger = () => {
+    console.log(screen)
     try {
         chrome.runtime.sendMessage({
             type: 'GAME_DETECTED', screen: screenData
