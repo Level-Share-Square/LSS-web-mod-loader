@@ -1,16 +1,19 @@
 // Look for all iframes on the page
 const docTitle = document?.title;
+let loaded = false;
 
 const checkForGame = () => {
 
     // Loop through iframes to find the target game
     const observer = new MutationObserver(() => {
-        const iframeWrapper = document.getElementById("game-wrapper");
-        const iframe = iframeWrapper?.firstChild || null;
-        if (iframe !== null && iframeSrc?.includes("/html5/supermarioconstruct")) {
+        const iframe = document.getElementById("game") || null;
+        if (iframe === null) return;
+        const iframeSrc = iframe?.src || null;
+        if (iframe !== null && iframeSrc?.includes("/html5/supermarioconstruct") && !loaded) {
             try {
+                loaded = true;
                 chrome.runtime.sendMessage({
-                    type: 'IFRAME_DETECTED',
+                    type: 'GAME_DETECTED',
                     iframeSrc: iframe.src,  // Make sure to use iframe.src, not iframe itself
                 });
             } catch (error) {

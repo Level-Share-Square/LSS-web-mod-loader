@@ -1,35 +1,84 @@
 const DYNAMIC_RULESET_ID = "dynamic_rules";
 
+// custom message if SMC is detected and the window pops up
+document.addEventListener("DOMContentLoaded", () => {
+	chrome.storage.local.get("smcDetected", (data) => {
+		if (data.smcDetected) {
+			const header = document.getElementById("header");
+			header.textContent = "Load your mods!";
+			chrome.storage.local.set({ smcDetected: false });
+		}
+	});
+});
+
+// enable button when a file is provided
+document.getElementById("fileUploadId").addEventListener("change", function () {
+	document.getElementById("submitButton").disabled = false;
+});
+
+// close button
+document.getElementById('closePopupBtn').addEventListener('click', function () {
+	window.close();
+});
+
+// parsing ini files
+const parseIniFile = (base64Content) => {
+	const decodedContent = window.atob(base64Content.split(',')[1]);
+	const lines = decodedContent.split('\n');
+	const parsedData = {};
+
+	lines.forEach(line => {
+		// Ignore empty lines or comments (lines starting with `;` or `#`)
+		if (line.trim() && !line.startsWith(';') && !line.startsWith('#')) {
+			const [key, value] = line.split('=').map(str => str.trim());
+
+			if (key && value !== undefined) {
+				parsedData[key] = value;
+			}
+		}
+	});
+
+	return parsedData;
+}
+
+// submit the form to load a new mod
 document.getElementById("replacementForm").addEventListener("submit", async (event) => {
 	event.preventDefault();
 
 	const fileInput = document.getElementById("fileUploadId");
-	const urlToReplace = document.getElementById("urlToReplace").value;
 
 	if (!fileInput.files.length) {
-		alert("Please select a file.");
+		alert("Please select an .ini file!");
 		return;
 	}
 
 	const file = fileInput.files[0];
+	const filePath = file.name;
 	const reader = new FileReader();
 
-	reader.onload = async function () {
-		const base64String = reader.result.replace(/^.+,/, "");
-		const replacementUrl = `data:image/png;base64,${base64String}`;
+	reader.addEventListener("load", async () => {
+		const fileContent = reader.result;
+		// Parse the content
+		const result = await parseIniFile(fileContent);
+		const { GameVersion, Version, Name, ImageRoot } = result;
+		const response = await fetch("https://levelsharesquare.com/api/accesspoint/gameversion/SMC");
+		const currentGameVer = (await response.json())?.version;
 
-		// Save mapping in local storage
-		chrome.storage.local.get("urlMappings", async (result) => {
-			const mappings = result.urlMappings || {};
-			mappings[urlToReplace] = replacementUrl;
+		let proceed = true;
 
-			chrome.storage.local.set({ urlMappings: mappings }, async () => {
-				await updateRules(mappings);
-				alert("Mapping saved!");
-				displayMappings();
+		if (GameVersion !== currentGameVer) {
+			proceed = await new Promise(resolve => {
+				const userResponse = confirm(`You are already on the latest version! (v${result.gameversion})`);
+				resolve(userResponse);
 			});
-		});
-	};
+		}
+
+		if (!proceed)
+			return;
+
+		const imageFilePath = filePath.replace(".ini", ImageRoot);
+
+	});
 
 	reader.readAsDataURL(file);
 });
