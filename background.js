@@ -1,19 +1,30 @@
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'GAME_DETECTED') {
-        console.log(`Target game detected`);
-
         // Perform your action here, like enabling the extension or injecting new content
         chrome.storage.local.set({ smcDetected: true });
+
+        // Close all other popups
+        chrome.windows.getAll({ populate: true }, (windows) => {
+            windows.forEach((window) => {
+                if (window.type === 'popup') {
+                    chrome.windows.remove(window.id);
+                }
+            });
+        });
+
+        const screen = message.screen;
+
         chrome.windows.create({
-            url: 'popup/popup.html', // Path to your popup HTML file
+            url: 'popup/main/popup.html', // Path to your popup HTML file
             type: 'popup',
             width: 500,
-            height: 400,
-            top: 80,
+            height: Math.round(screen.availHeight * 0.9),
+            top: Math.round(screen.availHeight * 0.1),
             left: 0,
         });
-    }
+    };
 });
+
 
 // Add a rule for redirection
 const addRedirectionRule = async (originalUrl, replacementUrl) => {

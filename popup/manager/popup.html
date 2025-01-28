@@ -3,17 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SMC Mod Loader</title>
+    <title>SMC Mod Manager</title>
+    <link rel="stylesheet" href="../../styles/global.css" />
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <h1 id="header">SMC Mod Loader</h1>
+    <h1 id="header">SMC Mod Manager</h1>
     <div class="container">
       <form id="replacementForm">
         <label for="fileUploadId"
-          >Enter a <u>loader.ini</u> file to load a new modpack:</label
-        >
-        <input type="file" id="fileUploadId" accept=".ini" />
+          >Enter a <u>modpack folder</u> with a valid <i>loader.ini</i> file to
+          load it:
+        </label>
+        <input type="file" id="fileUploadId" webkitdirectory multiple />
         <div class="flex">
           <button type="submit" id="submitButton" disabled>Load modpack</button>
           <button type="button" id="closePopupBtn">Close</button>

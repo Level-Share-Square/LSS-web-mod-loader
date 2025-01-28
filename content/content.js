@@ -1,39 +1,49 @@
-// Look for all iframes on the page
-const docTitle = document?.title;
-let loaded = false;
-
-const checkForGame = () => {
-
-    // Loop through iframes to find the target game
-    const observer = new MutationObserver(() => {
-        const iframe = document.getElementById("game") || null;
-        if (iframe === null) return;
-        const iframeSrc = iframe?.src || null;
-        if (iframe !== null && iframeSrc?.includes("/html5/supermarioconstruct") && !loaded) {
-            try {
-                loaded = true;
-                chrome.runtime.sendMessage({
-                    type: 'GAME_DETECTED',
-                    iframeSrc: iframe.src,  // Make sure to use iframe.src, not iframe itself
-                });
-            } catch (error) {
-                console.error("Error sending message to background:", error);
-            }
-        }
-    });
-
-    console.log("test", docTitle, docTitle === 'Super Mario Construct')
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // detect the HTML page
-    if (docTitle === 'Super Mario Construct') {
-        chrome.runtime.sendMessage({
-            type: 'GAME_DETECTED',
-        });
-        return
-    }
+let pathname = window.location.pathname;
+let isObserverConnected = true;
+const screenData = {
+    availWidth: screen.availWidth || 400,
+    availHeight: screen.availHeight || 600
 }
 
+const trigger = () => {
+    try {
+        chrome.runtime.sendMessage({
+            type: 'GAME_DETECTED', screen: screenData
+        });
+    } catch (e) {
+        console.error(e);
+    }
+};
+// Loop through iframes to find the target game
+const observer = new MutationObserver(() => {
+    const iframe = document.getElementById("game") || null;
+    if (iframe === null) return;
+    const iframeSrc = iframe?.src || null;
 
-// Run the functions
-checkForGame()
+    // Send message if the game is detected
+    if (iframeSrc?.includes("/html5/supermarioconstruct")) {
+        observer.disconnect();
+        isObserverConnected = false;
+        trigger();
+        pathname = window.location.pathname;
+    }
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Dynamically check the page title
+if (document.title === 'Super Mario Construct') {
+    observer.disconnect();
+    trigger();
+    pathname = window.location.pathname;
+
+}
+
+// Reset pathname every 5 seconds to handle React/SPA URL changes
+const interval = setInterval(() => {
+    if (pathname !== window?.location?.pathname && !isObserverConnected) {
+        console.log('Resetting pathname');
+        pathname = window.location.pathname;
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+}, 5000);

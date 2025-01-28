@@ -45,7 +45,7 @@ body::after {
 h1 {
   color: #f9f9f9;
   font-size: 3em;
-  margin: 4px 0;
+  margin-bottom: 12px;
   text-align: center;
 }
 
