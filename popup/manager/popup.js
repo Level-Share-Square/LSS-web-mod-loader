@@ -3,7 +3,11 @@ let currentGameVer = ""
 const getGameVer = async () => {
     const response = await fetch("https://levelsharesquare.com/api/accesspoint/gameversion/SMC");
     currentGameVer = (await response.json())?.version;
+    const gameVerSpan = document.getElementById("SMC-ver-display");
+    gameVerSpan.textContent = `${currentGameVer}`
 }
+
+window.addEventListener("DOMContentLoaded", getGameVer);
 
 // close button
 document.getElementById('closePopupBtn').addEventListener('click', function () {
@@ -46,8 +50,8 @@ document.getElementById("replacementForm").addEventListener("submit", async (eve
         return;
     }
 
+    // Check for the .ini file
     const iniFile = Array.from(fileInput.files).find(file => file.name.endsWith('.ini'));
-    const filePath = iniFile ? iniFile.name : null;
     const reader = new FileReader();
 
     if (!iniFile) {
@@ -57,30 +61,67 @@ document.getElementById("replacementForm").addEventListener("submit", async (eve
 
     reader.addEventListener("load", async () => {
         const fileContent = reader.result;
-        // Parse the content
-        const result = await parseIniFile(fileContent);
+        const result = await parseIniFile(fileContent); // Your custom function to parse .ini files
         const { GameVersion, Version, Name, ImageRoot } = result;
 
         let proceed = true;
 
-        // validate game version
+        // Validate game version
         if (GameVersion !== currentGameVer) {
             proceed = await new Promise(resolve => {
-                const userResponse = confirm(`The latest game version is ${currentGameVer} while this modpack is for ${GameVersion}. Do you want to proceed?`);
+                const userResponse = confirm(
+                    `The latest game version is ${currentGameVer} while this modpack is for ${GameVersion}. Do you want to proceed?`
+                );
                 resolve(userResponse);
             });
         }
 
-        if (!proceed)
+        if (!proceed) return;
+
+        // Find the ImageRoot folder
+        const imageFolder = Array.from(fileInput.files).filter(file =>
+            file.webkitRelativePath.startsWith(ImageRoot)
+        );
+
+        if (!imageFolder.length) {
+            alert(`The folder "${ImageRoot}" specified in the .ini file was not found.`);
             return;
+        }
 
-        // get the filepath
-        const imageFilePath = filePath.replace(".ini", ImageRoot);
-        // get all images in the folder
-
+        // Filter images and encode them in Base64
+        const imageFiles = imageFolder.filter(file => /\.(png|jpe?g|gif|webp)$/i.test(file.name));
+        await storeImageFiles(imageFiles, Version, Name);
 
     });
 
-    reader.readAsDataURL(iniFile);
+    reader.readAsText(iniFile); // Read the .ini file as text
 });
+
+const storeImageFiles = async (images, version, name) => {
+    const encodedImages = await Promise.all(
+        images.map(file => new Promise((resolve, reject) => {
+            const imgReader = new FileReader();
+            imgReader.onload = () => {
+                resolve({
+                    fileName: file.name,
+                    base64: imgReader.result // Base64-encoded image
+                });
+            };
+            imgReader.onerror = () => reject(`Failed to read file: ${file.name}`);
+            imgReader.readAsDataURL(file);
+        }))
+    );
+
+    // Store the encoded images in `chrome.storage` or any other storage
+    const imageStorageKey = `${name}-${version}`; // Key to store images
+    const imageData = encodedImages.reduce((acc, { fileName, base64 }) => {
+        acc[fileName] = base64;
+        return acc;
+    }, {});
+
+    // Example: Store images in `chrome.storage.local`
+    chrome.storage.local.set({ [imageStorageKey]: imageData }, () => {
+        console.log("Images stored successfully:", imageData);
+    });
+}
 

@@ -13,11 +13,6 @@ window.onresize = () => {
 	}
 };
 
-// prevent fullscreen
-window.addEventListener('blur', () => {
-	window.close();
-})
-
 // close button
 document.getElementById('closePopupBtn').addEventListener('click', () => {
 	window.close();
@@ -43,6 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (data.smcDetected) {
 			const header = document.getElementById("header");
 			header.textContent = "Manage your mods!";
+			// prevent fullscreen
+			window.addEventListener('blur', () => {
+				window.close();
+			})
 			chrome.storage.local.set({ smcDetected: false });
 		}
 	});
