@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SMC Mod Manager</title>
-    <link rel="stylesheet" href="../../styles/global.css" />
-    <link rel="stylesheet" href="popup.css" />
-  </head>
-  <body>
-    <h1 id="header">SMC Mod Manager</h1>
-    <div class="container">
-      <form id="replacementForm">
-        <label for="fileUploadId"
-          >Enter a <u>modpack folder</u> with a valid <i>loader.json</i> file to
-          load it:
-        </label>
-        <input type="file" id="fileUploadId" webkitdirectory multiple />
-        <div class="flex">
-          <button type="submit" id="submitButton" disabled>Load modpack</button>
-          <button type="button" id="closePopupBtn">Close</button>
-        </div>
-        <span>Current SMC Version: <u id="SMC-ver-display"></u></span>
-      </form>
-      <div class="line">
-        <hr />
-      </div>
-      <i id="empty">You haven't loaded any mods yet.</i>
-      <ul id="modList"></ul>
-    </div>
-    <script src="popup.js"></script>
-    <script src="../../helpers/utils.js"></script>
-  </body>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>SMC Mod Manager</title>
+	<link rel="stylesheet" href="../../styles/global.css" />
+	<link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+	<h1 id="header">SMC Mod Manager</h1>
+	<div class="container">
+		<form id="replacementForm">
+			<label for="uploadModFolder">Enter a <u>modpack folder</u> with a valid <i>loader.json</i> file to
+				load it:
+			</label>
+			<input type="file" id="uploadModFolder" webkitdirectory multiple />
+			<div class="flex">
+				<button type="submit" id="submitButton" disabled>Load modpack</button>
+				<button type="button" id="closePopupBtn">Close</button>
+			</div>
+			<span>Current SMC Version: <u id="SMC-ver-display"></u></span>
+		</form>
+		<div class="line">
+			<hr />
+		</div>
+		<i id="empty">You haven't loaded any mods yet.</i>
+		<ul id="modList"></ul>
+	</div>
+	<script src="popup.js"></script>
+	<script src="../../helpers/utils.js"></script>
+</body>
+
 </html>
