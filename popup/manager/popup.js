@@ -46,7 +46,6 @@ document
     const loaderFile = Array.from(fileInput.files).find(
       (file) => file.name === "loader.json"
     );
-    const filePath = loaderFile ? loaderFile.name : null;
     const reader = new FileReader();
 
     if (!loaderFile) {
@@ -103,9 +102,14 @@ document
         alert("No images found in the specified ImageRoot!");
         return;
       }
-
+      console.log(Name);
       await chrome.storage.local.set({
-        [Name]: { version: Version, gameVersion: GameVersion, images: {} },
+        [Name]: {
+          version: Version,
+          gameVersion: GameVersion,
+          images: {},
+          enabled: true,
+        },
       });
 
       // Process each image
@@ -114,8 +118,7 @@ document
         const imagePath = image.webkitRelativePath.replace(
           normalizedImageRoot + "/",
           ""
-        ); // Get the relative path
-        const imageName = image.name;
+        );
 
         // read the image and decode to base 64
         const base64 = await new Promise((resolve) => {
@@ -129,10 +132,11 @@ document
         // get the mod
         chrome.storage.local.get(Name, async (result) => {
           const newMod = result[Name] || {};
-          // update values
-          newMod.images[imagePath + imageName] = `data:image/${
-            image.type.split("/")[1]
-          };base64,${base64}`;
+          // update the values
+          newMod.images[imagePath] = [
+            `data:image/${image.type.split("/")[1]};base64,${base64}`,
+            true,
+          ]; // add true to indicate it is enabled
 
           // update in storage
           chrome.storage.local.set({ [Name]: newMod });

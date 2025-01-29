@@ -45,14 +45,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === CONSTANTS.RELOAD_MODS) {
-    updateRules();
+    reloadModRules();
     sendResponse({ type: CONSTANTS.MODS_RELOADED });
   }
 });
 
-const updateRules = async (mods) => {
+const reloadModRules = async (mods) => {
   // TODO logic is needed to load all mods and COMBINE the images into a singular one, first load the initial image.
   // TODO then load the rest of the mods into the same image.
+
+  chrome.storage.local.get(null, (result) => {
+    // load the mods
+    const allMods =
+      Object.entries(result).map(([name, mod]) => ({ name, ...mod })) || [];
+    const mods = allMods.filter((mod) => mod.enabled);
+    const imageMap = {};
+
+    // loop through the mods and their entries
+    mods.forEach((mod) => {
+      Object.entries(mod.images).forEach(([imageName, base64Data]) => {
+        // create a new entry in the map if it doesn't exist
+        if (!imageMap[imageName]) {
+          imageMap[imageName] = { name: imageName };
+        }
+        // add the base64 image to the entry
+        const index = Object.keys(imageMap[imageName]).length - 1; // -1 to exclude "name" key
+        imageMap[imageName][index] = base64Data;
+      });
+    });
+
+    const images = Object.values(imageMap);
+    console.log(images);
+  });
+
   //   const rules = Object.entries(mappings).map(([url, replacement], index) => ({
   //     id: index + 1,
   //     priority: 1,
@@ -69,7 +94,7 @@ const updateRules = async (mods) => {
 const removeMod = async (name, sendResponse) => {
   // Fetch the current mappings
   chrome.storage.local.remove(name);
-  updateRules();
+  reloadModRules();
 };
 
 // Add a rule for redirection
