@@ -21,9 +21,11 @@ document.getElementById("closePopupBtn").addEventListener("click", function () {
 });
 
 // enable button when a file is provided
-document.getElementById("fileUploadId").addEventListener("change", function () {
-  document.getElementById("submitButton").disabled = false;
-});
+document
+  .getElementById("uploadModFolder")
+  .addEventListener("change", function () {
+    document.getElementById("submitButton").disabled = false;
+  });
 
 // domcontent loaded callback to display the mods
 document.addEventListener("DOMContentLoaded", () => {
@@ -36,7 +38,7 @@ document
   .addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const fileInput = document.getElementById("fileUploadId");
+    const fileInput = document.getElementById("uploadModFolder");
 
     if (!fileInput.files.length) {
       alert("Please upload the mod folder!");
@@ -151,7 +153,7 @@ document
           if (response.type === CONSTANTS.MODS_RELOADED) {
             // update list, clear files and disable button again
             displayMods();
-            document.getElementById("fileUploadId").value = "";
+            document.getElementById("uploadModFolder").value = "";
             document.getElementById("submitButton").disabled = true;
           }
         }

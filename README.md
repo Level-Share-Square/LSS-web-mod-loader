@@ -1,4 +1,4 @@
-# Super Mario Construct mod loader 1.0
+# Super Mario Construct Mod Loader v1.0
 
 This extension serves as a method of loading mods for the Super Mario Construct web version, don't use it for the desktop version.
 This version was last updated during SMC b29.3 and may no longer work properly in future versions of Super Mario Construct.
@@ -17,5 +17,7 @@ Simply copy the `example-folder` into your own project, then change the followin
 
 ## Credits
 
-MrGerund (The Flying Dutchman) - Programming
-WINRARisyou - Programming
+### Programming
+
+MrGerund (The Flying Dutchman)\
+WINRARisyou
