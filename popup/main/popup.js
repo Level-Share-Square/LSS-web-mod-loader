@@ -40,7 +40,7 @@ document.getElementById("openManagerButton").addEventListener("click", () => {
 
 // custom message if SMC is detected and the window pops up
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.local.get("smcDetected", (data) => {
+  chrome.storage.session.get("smcDetected", (data) => {
     // modify the popup
     if (data.smcDetected) {
       const header = document.getElementById("header");
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.addEventListener("blur", () => {
         window.close();
       });
-      chrome.storage.local.set({ smcDetected: false });
+      chrome.storage.session.set({ smcDetected: false });
     }
   });
   // map the mods

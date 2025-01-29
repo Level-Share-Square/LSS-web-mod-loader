@@ -47,7 +47,6 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
   // Reset pathname every 5 seconds to handle React/SPA URL changes
   setInterval(() => {
     if (pathname !== window?.location?.pathname && !isObserverConnected) {
-      console.log("Resetting pathname");
       pathname = window.location.pathname;
       observer.observe(document.body, { childList: true, subtree: true });
     }

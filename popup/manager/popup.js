@@ -51,15 +51,21 @@ document
 
     if (!loaderFile) {
       alert(
-        "This isn't a valid modpack folder, make sure it has a .ini file at the root of the folder!"
+        "This isn't a valid modpack folder, make sure it has a loader.json file at the root of the folder!"
       );
       return;
     }
 
     reader.addEventListener("load", async () => {
-      const fileContent = reader.result;
-      // Parse the content
-      const result = JSON.parse(fileContent);
+      let result;
+      try {
+        const fileContent = reader.result;
+        // Parse the content
+        result = JSON.parse(window.atob(fileContent?.split(",")?.[1]));
+      } catch (error) {
+        alert(`The file provided is not a valid JSON file: ${error.message}`);
+        return;
+      }
       const { GameVersion, Version, Name, ImageRoot } = result;
 
       let proceed = true;
@@ -77,7 +83,6 @@ document
         alert("abort");
         return;
       }
-      console.log(result);
       // get the folder name
       const folderName = fileInput.files[0].webkitRelativePath.split("/")[0];
       const normalizedImageRoot = `${folderName}/${ImageRoot}`.replace(
@@ -87,7 +92,6 @@ document
 
       // get all images in the folder
       const images = Array.from(fileInput.files).filter((file) => {
-        console.log(fileInput.files);
         const filePath = file.webkitRelativePath; //directories use webKitRealtivePath
         return (
           filePath.startsWith(normalizedImageRoot) &&
@@ -100,14 +104,9 @@ document
         return;
       }
 
-      // Output image files
-      console.log("Images found:", images);
-      //alert(`Found ${images.length} images in images folder: ${ImageRoot}`);
-
-      //const mappings = {};
-      const modpackPrefix = `${Name}-${Version}`;
-      const baseUrl =
-        "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png";
+      await chrome.storage.local.set({
+        [Name]: { version: Version, gameVersion: GameVersion, images: {} },
+      });
 
       // Process each image
       for (const image of images) {
@@ -117,8 +116,8 @@ document
           ""
         ); // Get the relative path
         const imageName = image.name;
-        const storageKey = `${modpackPrefix}_${imageName}`;
 
+        // read the image and decode to base 64
         const base64 = await new Promise((resolve) => {
           imageReader.onload = () => {
             const base64String = imageReader.result.replace(/^.+,/, "");
@@ -127,30 +126,32 @@ document
           imageReader.readAsDataURL(image);
         });
 
-        await new Promise((resolve) => {
-          chrome.storage.local.set(
-            {
-              [storageKey]: `data:image/${
-                image.type.split("/")[1]
-              };base64,${base64}`,
-            },
-            resolve
-          );
-        });
-        // Save mappings to storage and update rules
-        chrome.storage.local.get("urlMappings", async (result) => {
-          const mappings = result.urlMappings || {};
-          // Add to mappings
-          mappings[baseUrl] = `data:image/${
+        // get the mod
+        chrome.storage.local.get(Name, async (result) => {
+          const newMod = result[Name] || {};
+          // update values
+          newMod.images[imagePath + imageName] = `data:image/${
             image.type.split("/")[1]
           };base64,${base64}`;
-          chrome.storage.local.set({ urlMappings: mappings }, async () => {
-            await updateRules(mappings);
-            displayMods();
-          });
+
+          // update in storage
+          chrome.storage.local.set({ [Name]: newMod });
         });
       }
-      console.log(`Added ${images.length} images from the modpack!`);
+      // when it is done looping, reload the mods
+      chrome.runtime.sendMessage(
+        {
+          type: CONSTANTS.RELOAD_MODS,
+        },
+        (response) => {
+          if (response.type === CONSTANTS.MODS_RELOADED) {
+            // update list, clear files and disable button again
+            displayMods();
+            document.getElementById("fileUploadId").value = "";
+            document.getElementById("submitButton").disabled = true;
+          }
+        }
+      );
     });
 
     reader.readAsDataURL(loaderFile);
