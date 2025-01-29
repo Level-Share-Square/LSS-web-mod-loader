@@ -39,7 +39,7 @@ document.getElementById("openManagerButton").addEventListener("click", () => {
 });
 
 // custom message if SMC is detected and the window pops up
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   chrome.storage.session.get("smcDetected", (data) => {
     // modify the popup
     if (data.smcDetected) {
@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       header.textContent = "Manage your mods!";
       // prevent fullscreen
       window.addEventListener("blur", () => {
+        if (window.devMode) return;
         window.close();
       });
       chrome.storage.session.set({ smcDetected: false });

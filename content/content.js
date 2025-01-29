@@ -51,4 +51,21 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
       observer.observe(document.body, { childList: true, subtree: true });
     }
   }, 5000);
+
+  // Listen for messages from the popup
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === CONSTANTS.CHECK_GAME_IFRAME) {
+      const iframe = document.getElementById("game") || null;
+      const hasIframes = iframe !== null;
+      // send the response
+      sendResponse(hasIframes);
+      return;
+    }
+    // reload the iframe
+    if (message.type === CONSTANTS.RELOAD_GAME) {
+      const iframe = document.getElementById("game") || null;
+      if (iframe !== null) iframe.contentWindow.location.reload();
+      return;
+    }
+  });
 });

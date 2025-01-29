@@ -4,8 +4,12 @@ const CONSTANTS = {
   MODS_RELOADED: "MODS_RELOADED",
   GAME_DETECTED: "GAME_DETECTED",
   GET_CONSTANTS: "GET_CONSTANTS",
+  CHECK_GAME_IFRAME: "CHECK_GAME_IFRAME",
+  RELOAD_GAME: "RELOAD_GAME",
   RELOAD_MODS: "RELOAD_MODS",
 };
+
+let replaceRoot = "https://levelsharesquare.com/html5/supermarioconstruct/";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // getting constants
@@ -14,28 +18,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === CONSTANTS.GAME_DETECTED) {
-    // Perform your action here, like enabling the extension or injecting new content
-    chrome.storage.session.set({ smcDetected: true });
+    chrome.storage.session.get("surpressPopup", (data) => {
+      // stop if this is invoked by a reload
+      if (data.surpressPopup) {
+        chrome.storage.session.set({ surpressPopup: false });
+        return;
+      }
+      // Perform your action here, like enabling the extension or injecting new content
+      chrome.storage.session.set({ smcDetected: true });
 
-    // Close all other popups
-    chrome.windows.getAll({ populate: true }, (windows) => {
-      windows.forEach((window) => {
-        if (window.type === "popup") {
-          chrome.windows.remove(window.id);
-        }
+      // Close all other popups
+      chrome.windows.getAll({ populate: true }, (windows) => {
+        windows.forEach((window) => {
+          if (window.type === "popup") {
+            chrome.windows.remove(window.id);
+          }
+        });
       });
-    });
 
-    const screen = message.screen;
+      const screen = message.screen;
 
-    chrome.windows.create({
-      url: "popup/main/popup.html", // Path to your popup HTML file
-      type: "popup",
-      width: 500,
-      height: Math.round(screen.height),
-      top: 0,
-      left: 0,
-      focused: true,
+      chrome.windows.create({
+        url: "popup/main/popup.html", // Path to your popup HTML file
+        type: "popup",
+        width: 500,
+        height: Math.round(screen.height),
+        top: 0,
+        left: 0,
+        focused: true,
+      });
     });
   }
 

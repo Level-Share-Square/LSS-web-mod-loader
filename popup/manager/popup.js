@@ -102,7 +102,7 @@ document
         alert("No images found in the specified ImageRoot!");
         return;
       }
-      console.log(Name);
+
       await chrome.storage.local.set({
         [Name]: {
           version: Version,
