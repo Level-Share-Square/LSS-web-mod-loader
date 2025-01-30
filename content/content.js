@@ -72,7 +72,6 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
       const images = message.images;
       //loop through the images
       const imageProcessingPromises = images.map(async (image) => {
-        const fullPath = message.fullRootPath + image.name;
         // get all base64 images
         const base64Arrays = Object.entries(image)
           .filter(([key, _]) => !isNaN(key)) // Only numeric keys
@@ -87,7 +86,7 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
           // successfully return an object with the data and path
           return {
             data: modifiedImage,
-            path: fullPath,
+            path: `${image.name}`,
           };
         } catch (error) {
           console.error("Error processing image:", error);
@@ -98,7 +97,6 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
       Promise.all(imageProcessingPromises).then((base64Arrays) => {
         // Filter out failed (null) images
         const validImages = base64Arrays.filter((img) => img !== null);
-        console.log("validImages", validImages);
         sendResponse({ newImages: validImages }); // Send the processed images
       });
       return true;
