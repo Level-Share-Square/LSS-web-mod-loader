@@ -10,9 +10,6 @@ const CONSTANTS = {
   PROCESS_IMAGES: "PROCESS_IMAGES",
 };
 
-console.log("background.js started!");
-chrome.declarativeNetRequest.getDynamicRules(console.log);
-
 let replaceRoot = "https://levelsharesquare.com/html5/supermarioconstruct/";
 const imageRoot = "images/";
 
@@ -155,8 +152,6 @@ const reloadModRules = async () => {
 
       // clean up all rules before making new ones
       chrome.declarativeNetRequest.getDynamicRules((rules) => {
-        console.log(rules);
-
         const ruleIds = rules.map((rule) => rule.id);
         chrome.declarativeNetRequest.updateDynamicRules(
           {
@@ -173,7 +168,6 @@ const reloadModRules = async () => {
                 urlFilter: path,
               },
             }));
-            console.log(newRules);
             // Update the dynamic ruleset
             chrome.declarativeNetRequest.updateDynamicRules({
               addRules: newRules,
