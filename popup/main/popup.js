@@ -1,9 +1,4 @@
 const DYNAMIC_RULESET_ID = "dynamic_rules";
-let CONSTANTS;
-
-chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
-  CONSTANTS = response.CONSTANTS;
-});
 
 // get initial size
 const initialHeight = window.outerHeight;
