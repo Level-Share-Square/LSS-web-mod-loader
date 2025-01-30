@@ -2,16 +2,17 @@
   "manifest_version": 3,
   "name": "SMC Mod Loader",
   "version": "1.0",
-  "description": "A mod loader for Super Mario Construct web version.",
+  "description": "A mod loader for Super Mario Construct's web version.",
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
     "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess"
+    "declarativeNetRequestWithHostAccess",
+    "tabs"
   ],
   "default_locale": "en",
-  "host_permissions": ["https://levelsharesquare.com/"],
+  "host_permissions": ["https://levelsharesquare.com/*"],
   "icons": {
     "16": "assets/icons/icon-16.png",
     "48": "assets/icons/icon-48.png",

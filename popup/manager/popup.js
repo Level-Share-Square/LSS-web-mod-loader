@@ -99,7 +99,7 @@ document
         alert("No images found in the specified ImageRoot!");
         return;
       }
-      console.log(Name);
+
       chrome.storage.local.set({
         [Name]: {
           version: Version,
@@ -130,10 +130,10 @@ document
         chrome.storage.local.get(Name, async (result) => {
           const newMod = result[Name] || {};
           // update the values
-          console.log(imagePath);
           newMod.images[imagePath] = [
             `data:image/${image.type.split("/")[1]};base64,${base64}`,
-          ]; // add true to indicate it is enabled
+            true, // add true to indicate it is enabled
+          ];
 
           // update in storage
           chrome.storage.local.set({ [Name]: newMod });

@@ -65,6 +65,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 const reloadModRules = async () => {
   const imageMap = {};
+  const fullRootPath = `${replaceRoot}${imageRoot}`;
 
   // load the mods
   const result = await new Promise((resolve) => {
@@ -81,15 +82,18 @@ const reloadModRules = async () => {
       if (!imageMap[imageName]) {
         imageMap[imageName] = { name: imageName };
       }
-      // add the base64 image to the entry
-      const index = Object.keys(imageMap[imageName]).length - 1; // -1 to exclude "name" key
-      imageMap[imageName][index] = base64Data;
+      // exclude name key
+      const index = Object.keys(imageMap[imageName]).length - 1;
+      // add image if it is enabled
+      if (base64Data[1] === true)
+        imageMap[imageName][index] = [
+          ...base64Data,
+          mod.name, // add the mod name to identify defects
+        ];
     });
   }
-
   // to array
   let images = Object.values(imageMap);
-  const fullRootPath = `${replaceRoot}${imageRoot}`;
 
   // Function to convert Blob to Base64
   const blobToBase64 = (blob) => {
@@ -97,8 +101,6 @@ const reloadModRules = async () => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (reader.result.startsWith("data:text/html;base64")) return resolve();
-
         // return the base64 string
         resolve(reader.result);
       };
@@ -108,7 +110,6 @@ const reloadModRules = async () => {
   };
 
   // first get the original images
-  await console.log(images);
   for (let i = 0; i < images.length; i++) {
     // define the image and fetch the original copy
     const image = images[i];
@@ -118,13 +119,15 @@ const reloadModRules = async () => {
     const blobImage = await originalImage.blob();
     // Convert Blob to Base64
     const base64Image = await blobToBase64(blobImage);
-    // Store the Base64 string in your images array
-    if (base64Image) image.originalImage = base64Image;
-    images[i] = image;
+    // Store the Base64 string in your images array if no error page was returned
+    if (!base64Image.startsWith("data:text/html;base64")) {
+      image.originalImage = base64Image;
+      images[i] = image;
+      // remove entries without original
+    } else delete images[i];
   }
-
-  await console.log(images);
-
+  // rid of empty entries
+  images = images.filter((image) => image !== undefined);
   // get the active tab to send a message to in content.js
   const activeTabs = await chrome.tabs.query({
     active: true,
@@ -135,74 +138,50 @@ const reloadModRules = async () => {
   const tabs = activeTabs.filter(
     (_, index) => windows[index].type === "normal"
   );
-  console.log(tabs);
   // send a message to be picked up by content.js
-  const newImages = await chrome.tabs.sendMessage(tabs[0].id, {
-    type: CONSTANTS.PROCESS_IMAGES,
-    images,
-    fullRootPath,
-  });
+  chrome.tabs.sendMessage(
+    tabs[0].id,
+    {
+      type: CONSTANTS.PROCESS_IMAGES,
+      images,
+      fullRootPath,
+    },
+    (imageResponse) => {
+      const newImages = imageResponse?.newImages || null;
+      // end if no response
+      if (!newImages || newImages.length === 0) return;
 
-  // clean up all rules before making new ones
-  await chrome.declarativeNetRequest.getDynamicRules((rules) => {
-    const ruleIds = rules.map((rule) => rule.id);
-    chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: ruleIds,
-    });
-  });
+      // clean up all rules before making new ones
+      chrome.declarativeNetRequest.getDynamicRules((rules) => {
+        console.log(rules);
 
-  if (!newImages || newImages.length === 0) return;
-  console.log(images);
-  console.log(newImages);
-  for (const img of newImages) {
-    const fullPath = `${fullRootPath}${img.name}`;
-    // load the original image
-
-    console.log(fullPath);
-    const response = await fetch(fullPath);
-    console.log(response.blob());
-
-    var mappings = {};
-    mappings[fullPath] = `${img[0]}`;
-
-    const rules = Object.entries(mappings).map(([url, replacement], index) => ({
-      id: index + 1,
-      priority: 1,
-      action: { type: "redirect", redirect: { url: replacement } },
-      condition: { urlFilter: url },
-    }));
-    // Update the dynamic ruleset
-    chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: rules.map((rule) => rule.id),
-      addRules: rules,
-    });
-  }
+        const ruleIds = rules.map((rule) => rule.id);
+        chrome.declarativeNetRequest.updateDynamicRules(
+          {
+            removeRuleIds: ruleIds,
+          },
+          () => {
+            // define the rules
+            const newRules = newImages.map(({ data, path }, index) => ({
+              id: index + 1,
+              priority: 1,
+              action: { type: "redirect", redirect: { url: data } },
+              condition: { resourceTypes: ["image"], urlFilter: path },
+            }));
+            console.log(newRules);
+            // Update the dynamic ruleset
+            chrome.declarativeNetRequest.updateDynamicRules({
+              addRules: newRules,
+            });
+          }
+        );
+      });
+    }
+  );
 };
 
 const removeMod = async (name, sendResponse) => {
   // Fetch the current mappings
   chrome.storage.local.remove(name);
   reloadModRules();
-};
-
-// Add a rule for redirection
-const addRedirectionRule = async (originalUrl, replacementUrl) => {
-  const ruleId = Date.now(); // Use a unique ID for the rule
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    addRules: [
-      {
-        id: ruleId,
-        priority: 1,
-        action: {
-          type: "redirect",
-          redirect: { url: replacementUrl },
-        },
-        condition: {
-          urlFilter: originalUrl,
-          resourceTypes: ["image"],
-        },
-      },
-    ],
-    removeRuleIds: [ruleId], // Remove existing rule with the same ID
-  });
 };

@@ -70,34 +70,45 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
     }
     if (message.type === CONSTANTS.PROCESS_IMAGES) {
       const images = message.images;
-      for (const image of images) {
+      //loop through the images
+      const imageProcessingPromises = images.map(async (image) => {
         const fullPath = message.fullRootPath + image.name;
-        console.log("!");
-        loadAndModifyImage(fullPath, image.base64Array)
-          .then((modifiedImage) => {
-            console.log("Modified Image:", modifiedImage);
+        // get all base64 images
+        const base64Arrays = Object.entries(image)
+          .filter(([key, _]) => !isNaN(key)) // Only numeric keys
+          .map(([_, value]) => value[0]); // Get base64 string
 
-            // Optionally display in the document
-            const imgElement = document.createElement("img");
-            imgElement.src = modifiedImage;
-            imgElement.style.position = "fixed"; // Fix position on the screen
-            imgElement.style.top = "50%"; // Center vertically
-            imgElement.style.left = "50%"; // Center horizontally
-            imgElement.style.transform = "translate(-50%, -50%)"; // Offset by 50% of width/height
-            imgElement.style.zIndex = "1000"; // Ensure it's above other elements
-            document.body.appendChild(imgElement);
-          })
-          .catch((error) => console.error("Error processing image:", error));
-      }
+        try {
+          // draw new image
+          const modifiedImage = await loadAndModifyImage(
+            image.originalImage,
+            base64Arrays
+          );
+          // successfully return an object with the data and path
+          return {
+            data: modifiedImage,
+            path: fullPath,
+          };
+        } catch (error) {
+          console.error("Error processing image:", error);
+          return null; // Skip failed images
+        }
+      });
+      // use Promise.all to wait for all image processing to complete
+      Promise.all(imageProcessingPromises).then((base64Arrays) => {
+        // Filter out failed (null) images
+        const validImages = base64Arrays.filter((img) => img !== null);
+        console.log("validImages", validImages);
+        sendResponse({ newImages: validImages }); // Send the processed images
+      });
+      return true;
     }
   });
 
-  const loadAndModifyImage = (imageUrl, base64OverlayArray) => {
+  const loadAndModifyImage = (original, modified) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = "Anonymous"; // Prevent CORS issues when modifying
-      img.src = imageUrl;
-      console.log("Loading image from: ", imageUrl);
+      img.src = original;
 
       img.onload = () => {
         const canvas = document.createElement("canvas");
@@ -111,10 +122,10 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
         ctx.drawImage(img, 0, 0);
 
         // Process all overlays in the base64Array
-        const overlayPromises = base64OverlayArray.map((base64Overlay) => {
+        const overlayPromises = modified.map((base64Overlay) => {
           return new Promise((resolveOverlay, rejectOverlay) => {
             const overlayImg = new Image();
-            overlayImg.src = `data:image/png;base64,${base64Overlay}`;
+            overlayImg.src = base64Overlay;
 
             overlayImg.onload = () => {
               // Draw each overlay image onto the canvas
@@ -135,8 +146,10 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
         // Wait for all overlays to finish
         Promise.all(overlayPromises)
           .then(() => {
-            // Once overlays are done, get the final image as Base64
-            const finalImage = canvas.toDataURL("image/png");
+            // get original file extension from the base64 string
+            const fileType = original.split(";")[0].split(":")[1];
+            // Once overlays are done, get the final image as Base64 in lossless format
+            const finalImage = canvas.toDataURL(fileType, 1);
             resolve(finalImage);
           })
           .catch(reject);
