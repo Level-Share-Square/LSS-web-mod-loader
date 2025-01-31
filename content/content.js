@@ -39,7 +39,10 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
   observer.observe(document.body, { childList: true, subtree: true });
 
   // Dynamically check the page title
-  if (document.title === "Super Mario Construct") {
+  if (
+    document.title === "Super Mario Construct" ||
+    document.title === "Yoshi's Fabrication Station"
+  ) {
     observer.disconnect();
     trigger();
     pathname = window.location.pathname;
