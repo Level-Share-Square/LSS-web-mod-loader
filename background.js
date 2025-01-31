@@ -1,4 +1,4 @@
-let devmode = true;
+let devmode = false;
 const CONSTANTS = {
   REMOVE_MOD: "REMOVE_MOD",
   MOD_REMOVED: "MOD_REMOVED",

@@ -60,11 +60,17 @@ document
       } = result;
 
       let proceed = true;
+      // check if the version is the same
+      const game = currentGameVersions.find(
+        (game) => game.acronym === GameAbbreviation
+      );
       // check if the game version is the same
-      if (GameVersion !== currentGameVer) {
+      if (GameVersion !== game?.version || !game?.version) {
         // confirmation
         proceed = confirm(
-          `The latest game version is ${currentGameVer}, but this modpack is for ${GameVersion}. Do you want to proceed?`
+          !game?.version
+            ? "This modpack is for an unkwnown game, do you wish to proceed?"
+            : `The latest game version is ${game?.version}, but this modpack is for ${GameVersion}. Do you want to proceed?`
         );
       }
 

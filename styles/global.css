@@ -121,12 +121,6 @@ body::after {
   cursor: pointer;
 }
 
-/* .action-button:hover {
-  color: rgb(0, 155, 255);
-  border-color: rgb(0, 155, 255);
-  background-color: rgba(0, 255, 255, 0.1);
-} */
-
 .list-item:not(:last-child) {
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 }
@@ -230,4 +224,23 @@ button.special:before {
 
 i {
   color: rgb(169, 169, 169);
+}
+
+h3 {
+  margin-bottom: 0px;
+}
+
+#game-ver-display {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+#game-ver-display:not(:has(span)) {
+  color: rgb(181, 181, 181);
+  font-style: italic;
 }

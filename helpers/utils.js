@@ -1,16 +1,25 @@
 window.devMode = false;
 const reloadModsButton = document.getElementById("reloadMods");
 let CONSTANTS;
-let currentGameVer = "";
+let currentGameVersions = [];
 
 const getGameVer = async () => {
   const response = await fetch(
-    "https://levelsharesquare.com/api/accesspoint/gameversion/SMC"
+    "https://levelsharesquare.com/api/accesspoint/gameversion/ALL"
   );
-  currentGameVer = (await response.json())?.version;
-  const gameVerSpan = document.getElementById("SMC-ver-display");
+  currentGameVersions = (await response.json())?.version;
+  const gameVerSpan = document.getElementById("game-ver-display");
   if (!gameVerSpan) return;
-  gameVerSpan.textContent = `${currentGameVer}`;
+  // map all game versions
+  currentGameVersions?.forEach((game) => {
+    const newChild = document.createElement("span");
+    newChild.textContent = `${game.acronym} - ${game.version}`;
+    gameVerSpan.appendChild(newChild);
+  });
+  // if no children were created...
+  if (gameVerSpan.children.length === 0) {
+    gameVerSpan.textContent = "Couldn't retrieve game versions";
+  }
 };
 
 chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
@@ -39,8 +48,11 @@ const displayMods = () => {
       const itemVersion = document.createElement("span");
       itemVersion.classList.add("list-item-version");
       itemVersion.innerHTML = `[${mod.gameAbbreviation} ${mod.gameVersion}]`;
+      const game = currentGameVersions.find(
+        (game) => game.acronym === mod.gameAbbreviation
+      );
       // if its outdated/unknown
-      if (mod.gameVersion !== currentGameVer || !mod.gameAbbreviation) {
+      if (mod.gameVersion !== game?.version || !mod.gameAbbreviation) {
         if (!mod.gameVersion || !mod.gameAbbreviation) {
           // handle unknown
           itemVersion.innerHTML = `[Unknown game/version]`;
