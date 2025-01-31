@@ -1,4 +1,5 @@
 let devmode = false;
+const chrome = chrome || browser;
 const CONSTANTS = {
   REMOVE_MOD: "REMOVE_MOD",
   MOD_REMOVED: "MOD_REMOVED",

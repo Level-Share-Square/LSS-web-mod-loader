@@ -1,4 +1,5 @@
 window.devmode = false;
+const chrome = chrome || browser;
 let pathname = window.location.pathname;
 let isObserverConnected = true;
 const screenData = {

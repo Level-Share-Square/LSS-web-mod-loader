@@ -1,4 +1,5 @@
 document.title = chrome.i18n.getMessage("extension_name");
+const chrome = chrome || browser;
 const targets = [
   "header_main",
   "header_manager",
