@@ -1,4 +1,4 @@
-window.devmode = true;
+window.devmode = false;
 let pathname = window.location.pathname;
 let isObserverConnected = true;
 const screenData = {

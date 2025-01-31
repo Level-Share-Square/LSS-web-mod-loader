@@ -42,6 +42,95 @@ body::after {
   width: 100%;
 }
 
+#mod-list:has(> .list-item) {
+  width: 100%;
+  overflow-y: auto;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 100%;
+  margin: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px;
+  transition: background-color 0.8s ease;
+}
+
+.list-item:hover {
+  background-color: rgba(255, 79, 231, 0.2);
+  cursor: default;
+}
+
+.list-item-text {
+  max-width: calc(100% - 60px);
+  flex-grow: 1;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 16px;
+}
+
+.list-item-version {
+  color: rgb(94, 255, 94);
+}
+
+.list-item-version.unknown {
+  color: rgb(255, 151, 40);
+}
+
+.list-item-version.outdated {
+  animation: outdated-mod 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes outdated-mod {
+  from {
+    color: rgb(255, 149, 0);
+  }
+  to {
+    color: rgb(255, 21, 21);
+  }
+}
+
+.action-button {
+  height: 50px;
+  width: 50px;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-width: 3px;
+  border-style: solid;
+  border-color: rgb(255, 255, 255);
+  border-radius: 8px;
+  color: rgb(255, 255, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  vertical-align: middle;
+  transition: all 0.4s ease;
+}
+
+.action-button:hover {
+  color: rgb(223, 38, 13);
+  border-color: rgb(223, 38, 13);
+  background-color: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+/* .action-button:hover {
+  color: rgb(0, 155, 255);
+  border-color: rgb(0, 155, 255);
+  background-color: rgba(0, 255, 255, 0.1);
+} */
+
+.list-item:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
 h1 {
   color: #f9f9f9;
   font-size: 3em;
@@ -73,19 +162,15 @@ form input[type="color"] {
   font-size: 14px;
 }
 
-ul {
-  margin-top: 20px;
-  padding-left: 20px;
-}
-
 button:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  cursor: not-allowed !important;
 }
 
-button {
+button:not(.action-button) {
   cursor: pointer;
   font-family: "Tomorrow-Medium" !important;
+  font-size: 14;
   color: white !important;
   border-style: none !important;
   padding: 8px 12px;
@@ -100,7 +185,7 @@ button {
   );
 }
 
-button:before {
+button:not(.action-button):before {
   content: "";
   color: white !important;
   position: absolute;
@@ -115,8 +200,20 @@ button:before {
   background-image: linear-gradient(12deg, rgb(3, 83, 212), rgb(50, 173, 255));
 }
 
-button:not(:disabled):hover:before {
+button:not(.action-button):not(:disabled):hover:before {
   opacity: 0;
+}
+
+button.special {
+  background-image: linear-gradient(
+    12deg,
+    rgb(160, 78, 130),
+    rgb(230, 148, 54)
+  );
+}
+
+button.special:before {
+  background-image: linear-gradient(12deg, rgb(10, 128, 89), rgb(11, 194, 207));
 }
 
 .flex {
@@ -128,7 +225,7 @@ button:not(:disabled):hover:before {
 
 .line {
   width: 100%;
-  padding: 6px 0;
+  margin: 6px 0 0 0;
 }
 
 i {

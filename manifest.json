@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SMC Mod Loader",
+  "name": "LSS Web Mod Loader",
   "version": "1.0",
-  "description": "A mod loader for Super Mario Construct's web version.",
+  "description": "A mod loader for Level Share Square web games.",
   "permissions": [
     "activeTab",
     "scripting",

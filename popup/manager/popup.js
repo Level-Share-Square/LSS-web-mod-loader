@@ -1,15 +1,3 @@
-let currentGameVer = "";
-
-const getGameVer = async () => {
-  const response = await fetch(
-    "https://levelsharesquare.com/api/accesspoint/gameversion/SMC"
-  );
-  currentGameVer = (await response.json())?.version;
-  const gameVerSpan = document.getElementById("SMC-ver-display");
-  gameVerSpan.textContent = `${currentGameVer}`;
-};
-getGameVer();
-
 // close button
 document.getElementById("closePopupBtn").addEventListener("click", function () {
   window.close();
@@ -24,7 +12,7 @@ document
 
 // domcontent loaded callback to display the mods
 document.addEventListener("DOMContentLoaded", () => {
-  displayMods();
+  getGameVer().then(() => displayMods());
 });
 
 // submit the form to load a new mod
@@ -43,71 +31,79 @@ document
     const loaderFile = Array.from(fileInput.files).find(
       (file) => file.name === "loader.json"
     );
-    const reader = new FileReader();
-
     if (!loaderFile) {
       alert(
-        "This isn't a valid modpack folder, make sure it has a loader.json file at the root of the folder!"
+        "This isn't a valid modpack folder. Make sure it has a loader.json file at the root!"
       );
       return;
     }
 
+    const reader = new FileReader();
+
     reader.addEventListener("load", async () => {
       let result;
       try {
-        const fileContent = reader.result;
-        // Parse the content
-        result = JSON.parse(window.atob(fileContent?.split(",")?.[1]));
+        // load the json loader file
+        result = await JSON.parse(window.atob(reader.result.split(",")[1]));
       } catch (error) {
-        alert(`The file provided is not a valid JSON file: ${error.message}`);
+        alert(`Invalid JSON file: ${error.message}`);
         return;
       }
-      const { GameVersion, Version, Name, ImageRoot } = result;
+      // get its contents
+      const {
+        GameVersion,
+        Version,
+        Name,
+        RootFolder,
+        ReferenceRoot,
+        GameAbbreviation,
+      } = result;
 
       let proceed = true;
-
+      // check if the game version is the same
       if (GameVersion !== currentGameVer) {
-        proceed = await new Promise((resolve) => {
-          const userResponse = confirm(
-            `The latest game version is ${currentGameVer} while this modpack is for ${GameVersion}. Do you want to proceed?`
-          );
-          resolve(userResponse);
-        });
+        // confirmation
+        proceed = confirm(
+          `The latest game version is ${currentGameVer}, but this modpack is for ${GameVersion}. Do you want to proceed?`
+        );
       }
 
+      // if not, abort
       if (!proceed) {
-        alert("abort");
+        alert("Operation aborted.");
         return;
       }
-      // get the folder name
+
+      // Get the folder name
       const folderName = fileInput.files[0].webkitRelativePath.split("/")[0];
-      const normalizedImageRoot = `${folderName}/${ImageRoot}`.replace(
+      const normalizedImageRoot = `${folderName}/${RootFolder?.Images}`.replace(
         /\/$/,
         ""
       );
 
-      // get all images in the folder
+      // Get all images in the folder
       const images = Array.from(fileInput.files).filter((file) => {
-        const filePath = file.webkitRelativePath; //directories use webKitRealtivePath
         return (
-          filePath.startsWith(normalizedImageRoot) &&
+          file.webkitRelativePath.startsWith(normalizedImageRoot) &&
           /\.(png|jpg|jpeg|gif|webp)$/i.test(file.name)
         );
       });
 
+      // Check if there are any images
       if (images.length === 0) {
-        alert("No images found in the specified ImageRoot!");
+        alert(chrome.i18n.getMessage("imageroot_warning"));
         return;
       }
 
-      chrome.storage.local.set({
-        [Name]: {
-          version: Version,
-          gameVersion: GameVersion,
-          images: {},
-          enabled: true,
-        },
-      });
+      // Create new mod object (overwrites existing data)
+      const newMod = {
+        version: Version,
+        gameVersion: GameVersion,
+        gameAbbreviation: GameAbbreviation,
+        targetPath: ReferenceRoot,
+        images: {}, // define the images object
+        enabled: true,
+      };
 
       // Process each image
       for (const image of images) {
@@ -117,42 +113,35 @@ document
           ""
         );
 
-        // read the image and decode to base 64
+        // Convert image to base64
         const base64 = await new Promise((resolve) => {
           imageReader.onload = () => {
-            const base64String = imageReader.result.replace(/^.+,/, "");
-            resolve(base64String);
+            resolve(imageReader.result.replace(/^.+,/, ""));
           };
           imageReader.readAsDataURL(image);
         });
 
-        // get the mod
-        chrome.storage.local.get(Name, async (result) => {
-          const newMod = result[Name] || {};
-          // update the values
-          newMod.images[imagePath] = [
-            `data:image/${image.type.split("/")[1]};base64,${base64}`,
-            true, // add true to indicate it is enabled
-          ];
-
-          // update in storage
-          chrome.storage.local.set({ [Name]: newMod });
-        });
+        // Overwrite images completely
+        newMod.images[imagePath] = [
+          `data:image/${image.type.split("/")[1]};base64,${base64}`,
+          true, // Enabled
+        ];
       }
-      // when it is done looping, reload the mods
-      chrome.runtime.sendMessage(
-        {
-          type: CONSTANTS.RELOAD_MODS,
-        },
-        (response) => {
-          if (response.type === CONSTANTS.MODS_RELOADED) {
-            // update list, clear files and disable button again
-            displayMods();
-            document.getElementById("uploadModFolder").value = "";
-            document.getElementById("submitButton").disabled = true;
+      // Store new mod data (overwrites existing)
+      chrome.storage.local.set({ [Name]: newMod }, () => {
+        // Reload mods after saving
+        chrome.runtime.sendMessage(
+          { type: CONSTANTS.RELOAD_MODS },
+          (response) => {
+            // upon receiving a response, update the list
+            if (response.type === CONSTANTS.MODS_RELOADED) {
+              displayMods();
+              document.getElementById("uploadModFolder").value = "";
+              document.getElementById("submitButton").disabled = true;
+            }
           }
-        }
-      );
+        );
+      });
     });
 
     reader.readAsDataURL(loaderFile);

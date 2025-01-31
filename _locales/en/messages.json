@@ -1,22 +1,50 @@
 {
   "extension_name": {
-    "message": "SMC Mod Loader",
+    "message": "LSS Web Mod Loader",
     "description": "The name of the extension"
   },
-  "extension_description": {
-    "message": "A mod loader for Super Mario Construct.",
-    "description": "The description of the extension displayed in the browser"
+  "header_main": {
+    "message": "LSS Web Mod Loader",
+    "description": "The name of the extension, used in the popup menu"
   },
-  "popup_title": {
-    "message": "Welcome to the Mod Loader!",
-    "description": "The title displayed in the popup"
+  "header_manager": {
+    "message": "Mod Manager Menu",
+    "description": "The menu in which you can add/remove mods"
   },
-  "button_load_mods": {
-    "message": "Load Mods",
-    "description": "Label for the button that loads mods"
+  "remove_mod": {
+    "message": "Remove mod",
+    "description": "The name of the button to remove a mod completely"
   },
-  "error_no_mods": {
-    "message": "No mods found in the folder.",
-    "description": "Error message when no mods are available"
+  "open_manager": {
+    "message": "Open manager",
+    "description": "The name of the button to open the manager"
+  },
+  "reload_mods": {
+    "message": "Reload mods",
+    "description": "The name of the button to reload the mods"
+  },
+  "close_popup": {
+    "message": "Close",
+    "description": "The name of the button to close the popup"
+  },
+  "load_modpack": {
+    "message": "Load modpack",
+    "description": "The name of the button to load a new modpack"
+  },
+  "no_mods": {
+    "message": "You haven't loaded any mods yet.",
+    "description": "The message to display when there are no mods loaded"
+  },
+  "remove_mod_confirm": {
+    "message": "Are you sure you want to permanently remove this mod? You will need to reload it from the files on your device to use it again.",
+    "description": "The message to confirm the deletion of a mod"
+  },
+  "imageroot_warning": {
+    "message": "No images found in the specified 'Images' folder of the root folder! Make sure you set the correct folder name.",
+    "description": "Debug message to warn the user if there are no images found in the specified folder OR if the folder doesn't exist."
+  },
+  "incompatible_mod": {
+    "message": "This mod was built under a different version of the game: It may work properly, or it may not.",
+    "description": "The name of the message to display when a mod is incompatible with the current game version"
   }
 }
