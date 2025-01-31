@@ -42,9 +42,14 @@ document
       let result;
       try {
         // load the json loader file
-        result = await JSON.parse(window.atob(reader.result.split(",")[1]));
+        result = await JSON.parse(
+          window
+            .atob(reader.result.split(",")[1])
+            .replaceAll(">", "")
+            .replaceAll("<", "")
+        );
       } catch (error) {
-        alert(chrome.i18n.getMessage("invalid_json_error", error.message));
+        alert(chrome.i18n.getMessage("invalid_json_error", [error.message]));
         return;
       }
       // get its contents
@@ -57,20 +62,39 @@ document
         GameAbbreviation,
       } = result;
 
+      const requiredFields = { Version, Name, RootFolder, ReferenceRoot };
+      const missingFields = Object.keys(requiredFields).filter(
+        (key) => !requiredFields[key]
+      );
+
+      if (missingFields.length > 0) {
+        // format the message with commas and "and"
+        const formattedFields =
+          missingFields.length > 1
+            ? missingFields.slice(0, -1).join(", ") +
+              " and " +
+              missingFields.at(-1)
+            : missingFields[0];
+
+        alert(chrome.i18n.getMessage("missing_fields_error", formattedFields));
+        return;
+      }
+
       let proceed = true;
       // check if the version is the same
       const game = currentGameVersions.find(
         (game) => game.acronym === GameAbbreviation
       );
+      const gv = game?.version || undefined;
       // check if the game version is the same
-      if (GameVersion !== game?.version || !game?.version) {
+      if (GameVersion !== gv || !gv) {
         // confirmation
         proceed = confirm(
-          !game?.version
+          !gv
             ? chrome.i18n.getMessage("unknown_game_warning")
             : chrome.i18n.getMessage("outdated_mod_warning", [
                 game?.version,
-                GameVersion,
+                result?.GameVersion,
               ])
         );
       }
