@@ -56,7 +56,7 @@
     "description": "The name of the message to display when a mod is incompatible with the current game version"
   },
   "game_versions_header": {
-    "message": "Current game versions",
+    "message": "Current LSS game versions",
     "description": "The name of the header to display game versions"
   },
   "upload_modpack_description": {
@@ -64,7 +64,7 @@
     "description": "Description explaining what to upload and what it should contain"
   },
   "unknown_game_warning": {
-    "message": "This modpack is for an unkwnown game, do you wish to proceed?",
+    "message": "This modpack is for an unknown game, do you wish to proceed?",
     "description": "The message to warn the user whether the modpack has an unknown game in its loader.json file"
   },
   "outdated_mod_warning": {
