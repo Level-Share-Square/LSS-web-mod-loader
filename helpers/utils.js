@@ -123,7 +123,10 @@ const reloadMods = () => {
       (response) => {
         // reload the page entirely if there are no iframes
         if (response === false) {
-          chrome.storage.session.set({ surpressPopup: true });
+          chrome.storage.session.set({
+            surpressPopup: true,
+            hardRefreshHint: true,
+          });
           return chrome.runtime.sendMessage(
             { type: CONSTANTS.RELOAD_MODS },
             () => {
@@ -143,6 +146,14 @@ const reloadMods = () => {
             if (response.type === CONSTANTS.MODS_RELOADED) {
               // update display
               displayMods();
+              const reloadModsElement =
+                document.getElementsByClassName("reload_mods");
+              reloadModsElement[0].innerHTML = chrome.i18n.getMessage(
+                "reload_mods_reminder"
+              );
+              reloadModsElement[0].title = chrome.i18n.getMessage(
+                "reload_mods_tooltip"
+              );
             }
             // reload the game on the current tab
             chrome.tabs.sendMessage(tabs[0].id, {

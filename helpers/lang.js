@@ -11,10 +11,22 @@ const targets = [
 
 // load the text content from the locale to match the target
 window.addEventListener("DOMContentLoaded", () => {
-  targets.forEach((target) => {
-    const elements = document.getElementsByClassName(target);
-    for (element of elements) {
-      element.innerHTML = chrome.i18n.getMessage(target);
-    }
+  // get the hardrefresh hint
+  chrome.storage.session.get("hardRefreshHint", (data) => {
+    const hardRefreshHint = data.hardRefreshHint;
+    // loop through the targets
+    targets.forEach((target) => {
+      // load all locales
+      const elements = document.getElementsByClassName(target);
+      for (element of elements) {
+        // use a reminder if needed
+        if (target === "reload_mods" && hardRefreshHint) {
+          target = "reload_mods_reminder";
+          chrome.storage.session.set({ hardRefreshHint: false });
+        }
+        // update contents
+        element.innerHTML = chrome.i18n.getMessage(target);
+      }
+    });
   });
 });

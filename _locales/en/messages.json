@@ -23,6 +23,14 @@
     "message": "Reload mods",
     "description": "The name of the button to reload the mods"
   },
+  "reload_mods_reminder": {
+    "message": "Try CTRL+SHIFT+R to hard refresh",
+    "description": "The name of the button to reload the mods to remind the user to hard refresh"
+  },
+  "reload_mods_tooltip": {
+    "message": "CTRL+SHIFT+R will reload the game without cached images, forcing mods to be enabled.",
+    "description": "The tooltip of the button to give information about hard reload"
+  },
   "close_popup": {
     "message": "Close",
     "description": "The name of the button to close the popup"
