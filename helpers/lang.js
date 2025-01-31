@@ -7,6 +7,8 @@ const targets = [
   "reload_mods",
   "no_mods",
   "load_modpack",
+  "game_versions_header",
+  "upload_modpack_description",
 ];
 
 // load the text content from the locale to match the target

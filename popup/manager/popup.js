@@ -24,7 +24,7 @@ document
     const fileInput = document.getElementById("uploadModFolder");
 
     if (!fileInput.files.length) {
-      alert("Please upload the mod folder!");
+      alert(chrome.i18n.getMessage("empty_folder_error"));
       return;
     }
 
@@ -32,9 +32,7 @@ document
       (file) => file.name === "loader.json"
     );
     if (!loaderFile) {
-      alert(
-        "This isn't a valid modpack folder. Make sure it has a loader.json file at the root!"
-      );
+      alert(chrome.i18n.getMessage("missing_json_error"));
       return;
     }
 
@@ -46,7 +44,7 @@ document
         // load the json loader file
         result = await JSON.parse(window.atob(reader.result.split(",")[1]));
       } catch (error) {
-        alert(`Invalid JSON file: ${error.message}`);
+        alert(chrome.i18n.getMessage("invalid_json_error", error.message));
         return;
       }
       // get its contents
@@ -69,14 +67,16 @@ document
         // confirmation
         proceed = confirm(
           !game?.version
-            ? "This modpack is for an unkwnown game, do you wish to proceed?"
-            : `The latest game version is ${game?.version}, but this modpack is for ${GameVersion}. Do you want to proceed?`
+            ? chrome.i18n.getMessage("unknown_game_warning")
+            : chrome.i18n.getMessage("outdated_mod_warning", [
+                game?.version,
+                GameVersion,
+              ])
         );
       }
 
       // if not, abort
       if (!proceed) {
-        alert("Operation aborted.");
         return;
       }
 

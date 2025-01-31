@@ -1,5 +1,3 @@
-const DYNAMIC_RULESET_ID = "dynamic_rules";
-
 // get initial size
 const initialHeight = window.outerHeight;
 const initialWidth = window.outerWidth;
@@ -39,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // modify the popup
     if (data.gameDetected) {
       const header = document.getElementById("header");
-      header.innerHTML = "Manage your mods!";
+      header.innerHTML = chrome.i18n.getMessage("game_detected_header");
       // prevent fullscreen
       window.addEventListener("blur", () => {
         if (window.devMode) return;

@@ -54,5 +54,45 @@
   "incompatible_mod": {
     "message": "This mod was built under a different version of the game: It may work properly, or it may not.",
     "description": "The name of the message to display when a mod is incompatible with the current game version"
+  },
+  "game_versions_header": {
+    "message": "Current game versions",
+    "description": "The name of the header to display game versions"
+  },
+  "upload_modpack_description": {
+    "message": "Upload a <u>modpack folder</u> with a valid <i>loader.json</i> file inside to load it:",
+    "description": "Description explaining what to upload and what it should contain"
+  },
+  "unknown_game_warning": {
+    "message": "This modpack is for an unkwnown game, do you wish to proceed?",
+    "description": "The message to warn the user whether the modpack has an unknown game in its loader.json file"
+  },
+  "outdated_mod_warning": {
+    "message": "The latest game version is {0}, but this modpack is for {1}. Do you want to proceed?",
+    "description": "The message to warn the user whether the mod may no longer work"
+  },
+  "invalid_json_error": {
+    "message": "Invalid JSON loader file: {0}",
+    "description": "The message to warn the user if the loader.json file is invalid"
+  },
+  "missing_json_error": {
+    "message": "This isn't a valid modpack folder, make sure it has a loader.json file at the root!",
+    "description": "The message to warn the user if the loader.json file is missing"
+  },
+  "empty_folder_error": {
+    "message": "This folder is empty! Please upload a valid modpack folder.",
+    "description": "The message to warn the user if the folder they selected is empty"
+  },
+  "game_version_retrieval_error": {
+    "message": "Couldn't retrieve game versions",
+    "description": "The message to warn the user if the game versions could not be retrieved"
+  },
+  "game_detected_header": {
+    "message": "Manage your mods!",
+    "description": "The name of the header to display when a game is detected"
+  },
+  "unknown_game_or_version": {
+    "message": "[Unknown game/version]",
+    "description": "The name of the header to display when a game is detected that is unknown to the LSS api"
   }
 }

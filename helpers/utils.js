@@ -18,7 +18,9 @@ const getGameVer = async () => {
   });
   // if no children were created...
   if (gameVerSpan.children.length === 0) {
-    gameVerSpan.textContent = "Couldn't retrieve game versions";
+    gameVerSpan.textContent = chrome.i18n.getMessage(
+      "game_version_retrieval_error"
+    );
   }
 };
 
@@ -55,7 +57,9 @@ const displayMods = () => {
       if (mod.gameVersion !== game?.version || !mod.gameAbbreviation) {
         if (!mod.gameVersion || !mod.gameAbbreviation) {
           // handle unknown
-          itemVersion.innerHTML = `[Unknown game/version]`;
+          itemVersion.innerHTML = chrome.i18n.getMessage(
+            "unknown_game_or_version"
+          );
           itemVersion.classList.add("unknown");
           // known but outdated
         } else {
