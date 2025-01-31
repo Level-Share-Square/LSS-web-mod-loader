@@ -16,8 +16,6 @@ Simply copy the `example-folder` into your own project, then change the followin
 - `ImageRoot`: The folder in which the extension will look for to replace the `/images/`path used by the game.
 
 ## Credits
-
 ### Programming
-
-MrGerund (The Flying Dutchman)\
-WINRARisyou
+MrGerund (AKA The Flying Dutchman)\
+WINRARisyou (Assistant Developer)
