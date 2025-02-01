@@ -138,20 +138,23 @@ button.toggle {
 button.toggle.toggled-off {
   background-color: rgba(255, 126, 79, 0.5);
 }
-
+/* hover toggle */
 button.toggle:hover {
-  --toggle-color: 223, 213, 13;
-  color: rgb(var(--toggle-color));
-  background-color: rgb(var(--toggle-color), 0.5);
+  filter: saturate(0.75);
   cursor: pointer;
 }
 
+/* slider default styles*/
 div.toggle-slider {
   width: 20px;
   height: 20px;
   border-width: 3px;
   border-style: solid;
-  background-color: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(
+    25deg,
+    rgba(184, 184, 184, 0.6),
+    rgba(255, 255, 255, 0.6)
+  );
   border-color: inherit;
   border-radius: 50%;
   position: relative;
@@ -163,16 +166,22 @@ div.toggle-slider {
   pointer-events: none;
 }
 
-div.toggle-slider.middle-state {
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+/* middle state of circle*/
+button.toggle:not(.toggled-off) div.toggle-slider.middle-state {
+  left: 80% !important;
+  transform: translateX(-80%) !important;
 }
 
+button.toggle.toggled-off div.toggle-slider.middle-state {
+  left: 20% !important;
+  transform: translateX(-20%) !important;
+}
+/* off state*/
 button.toggle.toggled-off div.toggle-slider {
   left: 0%;
   transform: translateX(0%);
 }
-
+/* add a border between items in the modlist */
 .list-item:not(:last-child) {
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 }
