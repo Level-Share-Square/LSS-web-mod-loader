@@ -1,0 +1,99 @@
+{
+  "extension_name": {
+    "message": "Chargeur de Mods web LSS"
+  },
+  "header_main": {
+    "message": "Chargeur de Mods web LSS"
+  },
+  "header_manager": {
+    "message": "Menu du gestionnaire de mods"
+  },
+  "remove_mod": {
+    "message": "Effacer mod"
+  },
+  "open_manager": {
+    "message": "Ouvrir gestionnaire"
+  },
+  "reload_mods": {
+    "message": "Recharger des mods"
+  },
+  "reload_mods_reminder": {
+    "message": "Essaie CTRL+SHIFT+R pour un rafraîchissement complet."
+  },
+  "reload_mods_tooltip": {
+    "message": "CTRL+SHIFT+R rechargera le jeu sans les images en cache, ce qui forcera les mods à se déclencher."
+  },
+  "close_popup": {
+    "message": "Fermer"
+  },
+  "load_modpack": {
+    "message": "Charger modpack"
+  },
+  "no_mods": {
+    "message": "Tu n'as pas encore chargé de mods."
+  },
+  "remove_mod_confirm": {
+    "message": "Es-tu sûr de vouloir effacer ce mod ? Tu devras le recharger à partir des fichiers de ton appareil pour pouvoir l'utiliser à nouveau."
+  },
+  "imageroot_warning": {
+    "message": "Aucune image n'a été trouvée dans le dossier ' Images ' spécifié dans le répertoire racine ! Assure-toi que tu as défini le nom de dossier correct."
+  },
+  "incompatible_mod": {
+    "message": "Ce mod a été créé avec une version différente du jeu : Il peut fonctionner correctement ou non."
+  },
+  "game_versions_header": {
+    "message": "Versions actuelles des jeux LSS"
+  },
+  "upload_modpack_description": {
+    "message": "Charger un <u>dossier de modpack</u> avec un fichier <i>loader.json</i> valide à l'intérieur pour le charger :"
+  },
+  "unknown_game_warning": {
+    "message": "Ce modpack est pour un jeu inconnu, veux-tu continuer ?"
+  },
+  "outdated_mod_warning": {
+    "message": "La dernière version du jeu est $game_version$, mais ce modpack est pour $modpack_game_version$. Veux-tu continuer ?",
+    "placeholders": {
+      "game_version": {
+        "content": "$1",
+        "example": "inconnue"
+      },
+      "modpack_game_version": {
+        "content": "$2",
+        "example": "version inconnue du jeu"
+      }
+    }
+  },
+  "invalid_json_error": {
+    "message": "Fichier de téléchargement JSON invalide : $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Erreur inconnue lors du traitement du fichier JSON."
+      }
+    }
+  },
+  "missing_json_error": {
+    "message": "Il ne s'agit pas d'un dossier valide, assure-toi qu'il y a un fichier nommé loader.json à la racine !"
+  },
+  "empty_folder_error": {
+    "message": "Ce dossier est vide ! Charge un dossier de mods valide."
+  },
+  "game_version_retrieval_error": {
+    "message": "Les versions du jeu n'ont pas pu être obtenues."
+  },
+  "game_detected_header": {
+    "message": "Gère tes mods !"
+  },
+  "unknown_game_or_version": {
+    "message": "[Jeu/version inconnu(e)]"
+  },
+  "missing_fields_error": {
+    "message": "Ce fichier JSON manque les champs suivants : $fields$.",
+    "placeholders": {
+      "fields": {
+        "content": "$1",
+        "example": "Version, Name, RootFolder, BaseURL, etc"
+      }
+    }
+  }
+}
