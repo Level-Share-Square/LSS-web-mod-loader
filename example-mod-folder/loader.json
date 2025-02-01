@@ -1,10 +1,10 @@
 {
-	"Version": "1.0",
-	"GameAbbreviation": "SMC",
-	"Name": "Spaghbettle",
-	"GameVersion": "v8.beta29.4",
-	"BaseURL": "https://levelsharesquare.com/html5/supermarioconstruct/",
-	"RootFolder": {
-		"Images": "assets/"
-	}
+  "Version": "1.2",
+  "GameAbbreviation": "SMC",
+  "Name": "Super long mod name that is prooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooopably undesirable",
+  "GameVersion": "v8.beta29.4",
+  "BaseURL": "https://levelsharesquare.com/html5/supermarioconstruct/",
+  "RootFolder": {
+    "Images": "assets/"
+  }
 }
