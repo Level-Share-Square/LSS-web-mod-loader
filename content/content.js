@@ -115,21 +115,61 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
 
-        // Set canvas size to match image
+        // Set canvas size to match the original image
         canvas.width = img.width;
         canvas.height = img.height;
 
         // Draw the original image onto the canvas
         ctx.drawImage(img, 0, 0);
 
-        // Process all overlays in the base64Array
+        // Process all overlays
         const overlayPromises = modified.map((base64Overlay) => {
           return new Promise((resolveOverlay, rejectOverlay) => {
             const overlayImg = new Image();
             overlayImg.src = base64Overlay;
 
             overlayImg.onload = () => {
-              // Draw each overlay image onto the canvas
+              const offCanvas = document.createElement("canvas");
+              const offCtx = offCanvas.getContext("2d");
+
+              // Match overlay size
+              offCanvas.width = overlayImg.width;
+              offCanvas.height = overlayImg.height;
+
+              // Draw overlay to an offscreen canvas
+              offCtx.drawImage(overlayImg, 0, 0);
+
+              // Get pixel data
+              const imageData = offCtx.getImageData(
+                0,
+                0,
+                overlayImg.width,
+                overlayImg.height
+              );
+              const pixels = imageData.data;
+
+              // Iterate through pixels and clear corresponding 16x16 areas on the main canvas
+              for (let y = 0; y < overlayImg.height; y++) {
+                for (let x = 0; x < overlayImg.width; x++) {
+                  const index = (y * overlayImg.width + x) * 4;
+                  const alpha = pixels[index + 3]; // Alpha channel
+
+                  if (alpha > 0) {
+                    // If pixel is not fully transparent
+                    // Get the top-left corner of the 16x16 block
+                    let blockX = Math.floor(x / 16) * 16;
+                    let blockY = Math.floor(y / 16) * 16;
+
+                    // Ensure we don't go outside the canvas bounds
+                    let clearWidth = Math.min(16, canvas.width - blockX);
+                    let clearHeight = Math.min(16, canvas.height - blockY);
+
+                    ctx.clearRect(blockX, blockY, clearWidth, clearHeight);
+                  }
+                }
+              }
+
+              // Draw the overlay image onto the main canvas
               ctx.drawImage(
                 overlayImg,
                 0,
@@ -147,8 +187,9 @@ chrome.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
         // Wait for all overlays to finish
         Promise.all(overlayPromises)
           .then(() => {
-            // get original file extension from the base64 string
+            // Get original file extension from base64 string
             const fileType = original.split(";")[0].split(":")[1];
+
             // Once overlays are done, get the final image as Base64 in lossless format
             const finalImage = canvas.toDataURL(fileType, 1);
             resolve(finalImage);
