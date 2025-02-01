@@ -95,5 +95,11 @@
         "example": "Version, Name, RootFolder, BaseURL, etc"
       }
     }
+  },
+  "click_to_disable": {
+    "message": "Cliquer ici pour activer cet mod"
+  },
+  "click_to_enable": {
+    "message": "Cliquer ici pout désactiver cet mod"
   }
 }
