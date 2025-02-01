@@ -1,8 +1,0 @@
-{
-  "Version": "1.0",
-  "GameAbbreviation": "SMC",
-  "Name": "<YOUR MOD NAME HERE>",
-  "GameVersion": "v8.beta29.4",
-  "ReferenceRoot": "https://levelsharesquare.com/html5/supermarioconstruct/",
-  "RootFolder": { "Images": "images/" }
-}

@@ -58,11 +58,11 @@ document
         Version,
         Name,
         RootFolder,
-        ReferenceRoot,
+        BaseURL,
         GameAbbreviation,
       } = result;
 
-      const requiredFields = { Version, Name, RootFolder, ReferenceRoot };
+      const requiredFields = { Version, Name, RootFolder, BaseURL };
       const missingFields = Object.keys(requiredFields).filter(
         (key) => !requiredFields[key]
       );
@@ -130,7 +130,7 @@ document
         version: Version,
         gameVersion: GameVersion,
         gameAbbreviation: GameAbbreviation,
-        targetPath: ReferenceRoot,
+        targetPath: BaseURL,
         images: {}, // define the images object
         enabled: true,
       };

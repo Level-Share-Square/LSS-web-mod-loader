@@ -1,0 +1,10 @@
+{
+	"Version": "1.0",
+	"GameAbbreviation": "SMC",
+	"Name": "Spaghbettle",
+	"GameVersion": "v8.beta29.4",
+	"BaseURL": "https://levelsharesquare.com/html5/supermarioconstruct/",
+	"RootFolder": {
+		"Images": "assets/"
+	}
+}

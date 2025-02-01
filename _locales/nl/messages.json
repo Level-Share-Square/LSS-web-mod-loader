@@ -92,7 +92,7 @@
     "placeholders": {
       "fields": {
         "content": "$1",
-        "example": "Version, Name, RootFolder, ReferenceRoot, etc"
+        "example": "Version, Name, RootFolder, BaseURL, etc"
       }
     }
   }
