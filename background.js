@@ -162,12 +162,14 @@ const reloadModRules = () => {
         const newImages = imageResponse?.newImages || null;
         // end if no response
         if (!newImages || newImages.length === 0) {
+          // clear old rules
           chrome.declarativeNetRequest.getDynamicRules((rules) => {
             const ruleIds = rules.map((rule) => rule.id);
             chrome.declarativeNetRequest.updateDynamicRules({
               removeRuleIds: ruleIds,
             });
           });
+          // end
           return resolve();
         }
 
@@ -187,9 +189,20 @@ const reloadModRules = () => {
                 condition: {
                   resourceTypes: ["xmlhttprequest"],
                   urlFilter: path,
+                  requestHeaders: [
+                    // prevent service worker intervention
+                    {
+                      header: "Cache-Control",
+                      operation: "set",
+                      value: "no-cache, no-store, must-revalidate",
+                    },
+                    { header: "Pragma", operation: "set", value: "no-cache" },
+                    { header: "Expires", operation: "set", value: "0" },
+                  ],
                 },
               }));
               if (devmode) console.log(newRules);
+
               // Update the dynamic ruleset
               chrome.declarativeNetRequest.updateDynamicRules(
                 {

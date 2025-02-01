@@ -1,0 +1,6 @@
+To properly apply your mods, make sure you follow the following steps:
+- Get a source images folder from our available resources.
+- Edit the images you want to modify and save as webp with LOSSLESS quality.
+- Place image in this folder, make sure name is unchanged.
+- To prevent conflicts, remove unchanged areas from the images, the mod loader checks 16x16 areas
+- DELETE THIS FILE IN THE FINAL PRODUCT

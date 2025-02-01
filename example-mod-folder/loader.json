@@ -1,9 +1,9 @@
 {
-  "Version": "1.2",
-  "GameAbbreviation": "SMC",
-  "Name": "Super long mod name that is prooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooopably undesirable",
-  "GameVersion": "v8.beta29.4",
-  "BaseURL": "https://levelsharesquare.com/html5/supermarioconstruct/",
+  "Version": "<YOUR_MOD_VERSION_NUMBER_HERE>",
+  "GameAbbreviation": "<GAME_ACRONYM_HERE>",
+  "Name": "<YOUR_MOD_NAME_HERE>",
+  "GameVersion": "<GAME_VERSION_HERE>",
+  "BaseURL": "https://levelsharesquare.com/html5/<GAME_LOCATION_HERE>/",
   "RootFolder": {
     "Images": "assets/"
   }
