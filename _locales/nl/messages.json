@@ -99,7 +99,7 @@
   "click_to_disable": {
     "message": "Klik deze knop om deze mod uit te schakelen"
   },
-  "mod_disabled": {
+  "click_to_enable": {
     "message": "Klik deze knop om deze mod weer aan te zetten"
   }
 }
