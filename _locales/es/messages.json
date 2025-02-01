@@ -79,7 +79,7 @@
     "message": "¡Esta carpeta está vacía! Por favor sube una carpeta de paquete de mods válida."
   },
   "game_version_retrieval_error": {
-    "message": "No se pudo obtener las versiones del juego."
+    "message": "No se pudieron obtener las versiones del juego."
   },
   "game_detected_header": {
     "message": "¡Administra tus mods!"
@@ -95,5 +95,11 @@
         "example": "Version, Name, RootFolder, BaseURL, etc"
       }
     }
+  },
+  "click_to_disable": {
+    "message": "Haz clic para deshabilitar este mod"
+  },
+  "click_to_enable": {
+    "message": "Haz clic para habilitar este mod"
   }
 }

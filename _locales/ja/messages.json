@@ -95,5 +95,11 @@
         "example": "Version, Name, RootFolder, BaseURL, etc"
       }
     }
+  },
+  "click_to_disable": {
+    "message": "モッドを有効"
+  },
+  "click_to_enable": {
+    "message": "モッドを無効"
   }
 }
