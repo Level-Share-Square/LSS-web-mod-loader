@@ -97,9 +97,9 @@
     }
   },
   "click_to_disable": {
-    "message": "Klik deze knop om deze mod uit te schakelen"
+    "message": "Klik op deze knop om de mod uit te schakelen"
   },
   "click_to_enable": {
-    "message": "Klik deze knop om deze mod weer aan te zetten"
+    "message": "Klik op deze knop om de mod weer aan te zetten"
   }
 }
