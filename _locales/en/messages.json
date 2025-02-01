@@ -125,7 +125,7 @@
     "message": "Click to disable this mod",
     "description": "The toggle tooltip that displays when a mod is enabled"
   },
-  "mod_disabled": {
+  "click_to_enable": {
     "message": "Click to enable this mod",
     "description": "The toggle tooltip that displays when a mod is disabled"
   }
