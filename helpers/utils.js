@@ -121,7 +121,7 @@ const createRemoveButton = (mod, listItem) => {
       (response) => {
         if (response.type === CONSTANTS.MOD_REMOVED) {
           listItem.remove();
-          if (modList.children.length === 0) {
+          if (document.getElementById("mod-list").children.length === 0) {
             document.getElementById("empty").style.display = "block";
           }
         }
@@ -213,17 +213,15 @@ const reloadMods = () => {
             surpressPopup: true,
             hardRefreshHint: true,
           });
-          return chrome.runtime.sendMessage(
-            { type: CONSTANTS.RELOAD_MODS },
-            () => {
-              if (window.devMode) return;
-              chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                func: () => location.reload(true), // Forces a full reload, bypassing cache
-              });
-              window.close();
-            }
-          );
+          chrome.runtime.sendMessage({ type: CONSTANTS.RELOAD_MODS }, () => {
+            if (window.devMode) return;
+            chrome.scripting.executeScript({
+              target: { tabId: tabs[0].id },
+              func: () => location.reload(true), // Forces a full reload, bypassing cache
+            });
+            window.close();
+          });
+          return;
         }
         // otherwise reload the mod rules
         chrome.runtime.sendMessage(

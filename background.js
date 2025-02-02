@@ -73,6 +73,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+/**
+ * Reloads the mod rules by going through all enabled mods, fetching their image
+ * data, and then sending a message to content.js to process the images.
+ *
+ * First, it removes all existing rules, then it loops through all enabled mods
+ * and their images, fetching the original image data, converting it to Base64,
+ * and storing it in an array. Then it sends a message to content.js to process
+ * the images, and once the response is received, it updates the dynamic rules
+ * with the new images. If no response is received, it clears all rules.
+ *
+ * @return {Promise<void>} - A promise that resolves when the dynamic rules have
+ * been updated or cleared.
+ */
 const reloadModRules = () => {
   return new Promise(async (resolve) => {
     const imageMap = {};
@@ -122,6 +135,25 @@ const reloadModRules = () => {
       });
     };
 
+    // remove all existing rules first
+    const rules = (await chrome.declarativeNetRequest.getDynamicRules()) || [];
+    const ruleIds = rules.map((rule) => rule.id);
+    // create a bypass for the images of the previous rules
+    const pathArray =
+      rules.map((rule) => escapeRegex(rule.condition.urlFilter)) || null;
+
+    // debug
+    if (devmode) console.log(rules, generateCacheBypassRule(pathArray));
+
+    // update the rules
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: ruleIds,
+      // add a cache bypass rule if applicable
+      ...(pathArray !== null && pathArray?.length
+        ? { addRules: [generateCacheBypassRule(pathArray)] }
+        : {}),
+    });
+
     // first get the original images
     for (let i = 0; i < images.length; i++) {
       // define the image and fetch the original copy
@@ -162,60 +194,95 @@ const reloadModRules = () => {
         const newImages = imageResponse?.newImages || null;
         // end if no response
         if (!newImages || newImages.length === 0) {
-          // clear old rules
-          chrome.declarativeNetRequest.getDynamicRules((rules) => {
-            const ruleIds = rules.map((rule) => rule.id);
-            chrome.declarativeNetRequest.updateDynamicRules({
-              removeRuleIds: ruleIds,
-            });
-          });
-          // end
+          if (devmode) console.log("Cleared all rules!");
           return resolve();
         }
 
         // clean up all rules before making new ones
-        chrome.declarativeNetRequest.getDynamicRules((rules) => {
-          const ruleIds = rules.map((rule) => rule.id);
-          chrome.declarativeNetRequest.updateDynamicRules(
-            {
-              removeRuleIds: ruleIds,
-            },
-            () => {
-              // define the rules
-              const newRules = newImages.map(({ data, path }, index) => ({
-                id: index + 1,
-                priority: 1,
-                action: { type: "redirect", redirect: { url: data } },
-                condition: {
-                  resourceTypes: ["xmlhttprequest"],
-                  urlFilter: path,
-                  requestHeaders: [
-                    // prevent service worker intervention
-                    {
-                      header: "Cache-Control",
-                      operation: "set",
-                      value: "no-cache, no-store, must-revalidate",
-                    },
-                    { header: "Pragma", operation: "set", value: "no-cache" },
-                    { header: "Expires", operation: "set", value: "0" },
-                  ],
-                },
-              }));
-              if (devmode) console.log(newRules);
-
-              // Update the dynamic ruleset
-              chrome.declarativeNetRequest.updateDynamicRules(
-                {
-                  addRules: newRules,
-                },
-                () => resolve()
-              );
-            }
-          );
-        });
+        handleDynamicRuleUpdate(newImages, resolve);
       }
     );
   });
+};
+
+/**
+ * Given an array of new images, defines the dynamic rules and updates the
+ * dynamic ruleset. This function is a callback for the promise returned by
+ * `updateImages()`.
+ *
+ * @param {Object[]} newImages - An array of objects containing the new image
+ * data and paths.
+ * @param {function} resolve - The callback function to call when the dynamic
+ * ruleset has been updated.
+ * @return {boolean} True if the dynamic ruleset was updated successfully.
+ */
+const handleDynamicRuleUpdate = (newImages, resolve) => {
+  // define the rules
+  const newRules = newImages.map(({ data, path }, index) => ({
+    id: index + 1,
+    priority: 1,
+    action: {
+      type: "redirect",
+      redirect: { url: data },
+    },
+    condition: {
+      resourceTypes: ["xmlhttprequest"],
+      urlFilter: path,
+    },
+  }));
+  // map all paths into a regex
+  const pathArray = newImages.map(({ path }) => escapeRegex(path));
+  // define a cache bypass rule
+  const cacheBypassRule = generateCacheBypassRule(pathArray);
+  // push it into the new rules
+  newRules.push(cacheBypassRule);
+
+  // log if in devmode
+  if (devmode) console.log(newRules);
+
+  // Update the dynamic ruleset
+  chrome.declarativeNetRequest.updateDynamicRules(
+    {
+      removeRuleIds: [9999],
+      addRules: newRules,
+    },
+    () => resolve()
+  );
+  return true;
+};
+
+// function to escape regex
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Generates a declarativeNetRequest rule to bypass cache for images
+ * in the LSS Web Mod Loader.
+ *
+ * @return {Object} The generated rule.
+ */
+const generateCacheBypassRule = (pathArray) => {
+  if (!pathArray || pathArray.length === 0) return null;
+  const regexPattern = `.*(${pathArray.join("|")}).*`;
+  return {
+    id: 9999,
+    priority: 1,
+    action: {
+      type: "modifyHeaders",
+      responseHeaders: [
+        {
+          header: "Cache-Control",
+          operation: "set",
+          value: "no-store, no-cache, must-revalidate",
+        },
+        { header: "Pragma", operation: "set", value: "no-cache" },
+        { header: "Expires", operation: "set", value: "0" },
+      ],
+    },
+    condition: {
+      resourceTypes: ["xmlhttprequest", "image"],
+      regexFilter: regexPattern, // Use regex to match multiple paths
+    },
+  };
 };
 
 const removeMod = async (name, sendResponse) => {
@@ -245,7 +312,7 @@ const toggleMod = async (name, Mod, sendResponse) => {
 
     // Save back to chrome.storage.local
     chrome.storage.local.set(updatedMods, () => {
-      console.log(`Toggled mod: ${Mod.name}`, updatedMods);
+      if (devmode) console.log(`Toggled mod: ${Mod.name}`, updatedMods);
     });
   });
   reloadModRules();
