@@ -1,0 +1,105 @@
+{
+  "extension_name": {
+    "message": "Gestor de Mods web de LSS"
+  },
+  "header_main": {
+    "message": "Gestor de Mods web de LSS"
+  },
+  "header_manager": {
+    "message": "Administrador de mods"
+  },
+  "remove_mod": {
+    "message": "Eliminar mod"
+  },
+  "open_manager": {
+    "message": "Abrir administrador"
+  },
+  "reload_mods": {
+    "message": "Recargar mods"
+  },
+  "reload_mods_reminder": {
+    "message": "Presiona CTRL+SHIFT+R para una recarga forzada"
+  },
+  "reload_mods_tooltip": {
+    "message": "CTRL+SHIFT+R recargará el juego sin imágenes en caché, forzando la activación de mods."
+  },
+  "close_popup": {
+    "message": "Cerrar"
+  },
+  "load_modpack": {
+    "message": "Cargar paquete de mods"
+  },
+  "no_mods": {
+    "message": "Aún no has cargado mods."
+  },
+  "remove_mod_confirm": {
+    "message": "¿De verdad quieres eliminar este mod de forma permanente? Tendrás que volver a cargarlo desde los archivos de tu dispositivo para volver a usarlo."
+  },
+  "imageroot_warning": {
+    "message": "¡No se encontraron imágenes en la carpeta 'Images' especificada de la carpeta raíz! Asegúrate de haber introducido el nombre correcto de la carpeta."
+  },
+  "incompatible_mod": {
+    "message": "Este mod se creó con una versión diferente del juego: Puede que funcione correctamente, o que no."
+  },
+  "game_versions_header": {
+    "message": "Versiones actuales de los juegos de LSS"
+  },
+  "upload_modpack_description": {
+    "message": "Sube una <u>carpeta con paquete de mods</u> con un archivo válido de nombre <i>loader.json</i> dentro de ella para cargarlo:"
+  },
+  "unknown_game_warning": {
+    "message": "Este paquete de mods es para un juego desconocido, ¿Deseas continuar?"
+  },
+  "outdated_mod_warning": {
+    "message": "La última versión del juego es $game_version$, pero la de este paquete de mods es $modpack_game_version$. ¿Deseas continuar?",
+    "placeholders": {
+      "game_version": {
+        "content": "$1",
+        "example": "desconocido"
+      },
+      "modpack_game_version": {
+        "content": "$2",
+        "example": "versión desconocida del juego"
+      }
+    }
+  },
+  "invalid_json_error": {
+    "message": "Archivo de carga JSON no válido: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Error desconocido al procesar archivo JSON."
+      }
+    }
+  },
+  "missing_json_error": {
+    "message": "Esta no es una carpeta de paquete de mods válida, ¡Asegúrate de que tenga un archivo de nombre loader.json en la raíz!"
+  },
+  "empty_folder_error": {
+    "message": "¡Esta carpeta está vacía! Por favor sube una carpeta de paquete de mods válida."
+  },
+  "game_version_retrieval_error": {
+    "message": "No se pudieron obtener las versiones del juego."
+  },
+  "game_detected_header": {
+    "message": "¡Administra tus mods!"
+  },
+  "unknown_game_or_version": {
+    "message": "[Juego/versión desconocido(a)]"
+  },
+  "missing_fields_error": {
+    "message": "Este archivo JSON del cargador no incluye los siguientes datos: $fields$.",
+    "placeholders": {
+      "fields": {
+        "content": "$1",
+        "example": "Version, Name, RootFolder, BaseURL, etc"
+      }
+    }
+  },
+  "click_to_disable": {
+    "message": "Haz clic para deshabilitar este mod"
+  },
+  "click_to_enable": {
+    "message": "Haz clic para habilitar este mod"
+  }
+}

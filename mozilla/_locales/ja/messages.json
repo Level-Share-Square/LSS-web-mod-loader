@@ -1,0 +1,105 @@
+{
+  "extension_name": {
+    "message": "LSSウェブモッドローダー"
+  },
+  "header_main": {
+    "message": "LSSウェブモッドローダー"
+  },
+  "header_manager": {
+    "message": "モッド管理"
+  },
+  "remove_mod": {
+    "message": "モッドの削除"
+  },
+  "open_manager": {
+    "message": "管理を開く"
+  },
+  "reload_mods": {
+    "message": "モッドのリロード"
+  },
+  "reload_mods_reminder": {
+    "message": "CTRL+SHIFT+Rでキャッシュを消す。"
+  },
+  "reload_mods_tooltip": {
+    "message": "CTRL+SHIFT+Rはキャッシュ画像なしでゲームをリロードし、モッドを強制的に有効にします。"
+  },
+  "close_popup": {
+    "message": "閉じる"
+  },
+  "load_modpack": {
+    "message": "モッドパックをロード"
+  },
+  "no_mods": {
+    "message": "まだモッドをロードしていない。"
+  },
+  "remove_mod_confirm": {
+    "message": "本当にこのモッドを永久に削除したいですか？再度使用するには、デバイス上のファイルから再読み込みする必要があります。"
+  },
+  "imageroot_warning": {
+    "message": "ルートフォルダの指定された「Images」フォルダに画像が見つかりません！正しいフォルダ名を設定してください。"
+  },
+  "incompatible_mod": {
+    "message": "このモッドは別のバージョンで作られたものです： 正しく動作するかもしれませんし、しないかもしれません。"
+  },
+  "game_versions_header": {
+    "message": "現在のLSSゲームバージョン"
+  },
+  "upload_modpack_description": {
+    "message": "有効なloader.jsonファイルを含むモッドパックフォルダーをアップロードしてロードします："
+  },
+  "unknown_game_warning": {
+    "message": "このモッドパックは未知のゲーム用です。続行しますか？"
+  },
+  "outdated_mod_warning": {
+    "message": "最新のゲームバージョンは$game_version$ですが、このモッドパックは$modpack_game_version$用です。続行しますか？",
+    "placeholders": {
+      "game_version": {
+        "content": "$1",
+        "example": "未知"
+      },
+      "modpack_game_version": {
+        "content": "$2",
+        "example": "未知のゲームバージョン"
+      }
+    }
+  },
+  "invalid_json_error": {
+    "message": "無効なJSONローダーファイルです：$error$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "JSONファイルの処理時に不明なエラーが発生しました。"
+      }
+    }
+  },
+  "missing_json_error": {
+    "message": "これは有効なモッドパックフォルダではありません。ルートにloader.jsonファイルがあることを確認してください！"
+  },
+  "empty_folder_error": {
+    "message": "このフォルダは空です！有効なモッドパックのフォルダをアップロードしてください。"
+  },
+  "game_version_retrieval_error": {
+    "message": "ゲームのバージョンを取得できませんでした。"
+  },
+  "game_detected_header": {
+    "message": "モッドの管理！"
+  },
+  "unknown_game_or_version": {
+    "message": "[不明なゲーム/バージョン]"
+  },
+  "missing_fields_error": {
+    "message": "このJSONファイルには次のフィールドがありません：$fields$.",
+    "placeholders": {
+      "fields": {
+        "content": "$1",
+        "example": "Version, Name, RootFolder, BaseURL, etc"
+      }
+    }
+  },
+  "click_to_disable": {
+    "message": "モッドを有効"
+  },
+  "click_to_enable": {
+    "message": "モッドを無効"
+  }
+}

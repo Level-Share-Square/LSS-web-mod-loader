@@ -1,0 +1,108 @@
+{
+  "extension_name": {
+    "message": "LSS Web Mod Lader"
+  },
+  "header_main": {
+    "message": "LSS Web Mod Lader"
+  },
+  "header_manager": {
+    "message": "Mod Beheerder Menu"
+  },
+  "remove_mod": {
+    "message": "Verwijder mod"
+  },
+  "open_manager": {
+    "message": "Open beheerder menu"
+  },
+  "reload_mods": {
+    "message": "Herlaad mods"
+  },
+  "reload_mods_reminder": {
+    "message": "CTRL+SHIFT+R om schoon te verversen"
+  },
+  "reload_mods_tooltip": {
+    "message": "CTRL+SHIFT+R herlaad de afbeeldingen en de scripts van het spel, inclusief de mods."
+  },
+  "close_popup": {
+    "message": "Sluiten"
+  },
+  "load_modpack": {
+    "message": "Laad mod pakket"
+  },
+  "no_mods": {
+    "message": "Je hebt nog geen mods toegevoegd."
+  },
+  "remove_mod_confirm": {
+    "message": "Weet je zeker dat je deze mod wilt verwijderen? Je moet het opnieuw van je apparaat laden om het te gebruiken."
+  },
+  "imageroot_warning": {
+    "message": "Er zijn geen afbeeldingen gevonden in de opgegeven 'Images' map! Zorg ervoor dat je de correcte mapnaam hebt ingesteld."
+  },
+  "incompatible_mod": {
+    "message": "Deze mod is gemaakt voor een andere versie van dit spel: Als het werkt, werkt het. Zo niet, dan ben je hierbij gewaarschuwd."
+  },
+  "game_versions_header": {
+    "message": "Nieuwste LSS spelversies"
+  },
+  "upload_modpack_description": {
+    "message": "Upload een <u>mod pakket map</u> met een volledig <i>loader.json</i> bestand om het toe te voegen:"
+  },
+  "unknown_game_warning": {
+    "message": "We weten niet voor welk spel dit zou zijn, weet je zeker dat je door wil gaan?"
+  },
+  "outdated_mod_warning": {
+    "message": "De meest recente versie van dit spel is $game_version$, maar deze mod is voor $modpack_game_version$. Wil je deze alsnog gebruiken?",
+    "placeholders": {
+      "game_version": {
+        "content": "$1",
+        "example": "niet bekend"
+      },
+      "modpack_game_version": {
+        "content": "$2",
+        "example": "een onbekende spelversie"
+      }
+    }
+  },
+  "invalid_json_error": {
+    "message": "Fout met dit JSON loader bestand: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Onbekende fout."
+      }
+    }
+  },
+  "missing_json_error": {
+    "message": "Dit is geen mod pakket map, zorg ervoor dat er een loader.json bestand direct in zit."
+  },
+  "empty_folder_error": {
+    "message": "Deze map is leeg, upload alsjeblieft een geldig mod pakket."
+  },
+  "game_version_retrieval_error": {
+    "message": "De spel gegevens konden niet worden opgehaald."
+  },
+  "game_detected_header": {
+    "message": "Beheer je mods!"
+  },
+  "unknown_game_or_version": {
+    "message": "[Onbekend spel en/of versie]"
+  },
+  "missing_fields_error": {
+    "message": "Het JSON loader bestand is niet compleet: $fields$ missen er.",
+    "placeholders": {
+      "fields": {
+        "content": "$1",
+        "example": "Version, Name, RootFolder, BaseURL, etc"
+      }
+    }
+  },
+  "click_to_disable": {
+    "message": "Klik op deze knop om de mod uit te schakelen"
+  },
+  "click_to_enable": {
+    "message": "Klik op deze knop om de mod weer aan te zetten"
+  },
+  "duplicate_key_warning": {
+    "message": "Je loader.json bestand mag geen sleutels in de rootfolder bevatten die dezelfde naam hebben als normale sleutels."
+  }
+}
