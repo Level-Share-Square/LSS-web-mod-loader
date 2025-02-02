@@ -160,13 +160,11 @@ document
       // Store new mod data (overwrites existing)
       chrome.storage.local.set({ [Name]: newMod }, () => {
         // Reload mods after saving
-        console.log("hmmm");
         chrome.runtime.sendMessage(
           { type: CONSTANTS.RELOAD_MODS },
           (response) => {
             // upon receiving a response, update the list
             if (response.type === CONSTANTS.MODS_RELOADED) {
-              console.log("hurray");
               displayMods();
               document.getElementById("uploadModFolder").value = "";
               document.getElementById("submitButton").disabled = true;
