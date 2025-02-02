@@ -140,12 +140,13 @@ const createToggleButton = (mod) => {
   const toggleModButton = document.createElement("button");
   toggleModButton.classList.add("toggle");
   toggleModButton.id = "toggle-button";
-  toggleModButton.title = mod.enabled
-    ? extension.i18n.getMessage("click_to_disable")
-    : extension.i18n.getMessage("click_to_enable");
 
   // initial state
   if (!mod.enabled) toggleModButton.classList.add("toggled-off");
+
+  toggleModButton.title = !toggleModButton.classList.contains("toggled-off")
+    ? extension.i18n.getMessage("click_to_disable")
+    : extension.i18n.getMessage("click_to_enable");
 
   // add en element inside the button
   const toggleSlider = document.createElement("div");
@@ -175,9 +176,11 @@ const createToggleButton = (mod) => {
         (response) => {
           if (response.type === CONSTANTS.MOD_TOGGLED) {
             // update message
-            toggleModButton.title == extension.i18n.getMessage("mod_disabled")
-              ? extension.i18n.getMessage("mod_enabled")
-              : extension.i18n.getMessage("mod_disabled");
+            toggleModButton.title = !toggleModButton.classList.contains(
+              "toggled-off"
+            )
+              ? extension.i18n.getMessage("click_to_disable")
+              : extension.i18n.getMessage("click_to_enable");
             // update class
             document.getElementById("reloadMods").classList.add("danger");
           }
