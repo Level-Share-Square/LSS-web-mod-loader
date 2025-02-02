@@ -17,5 +17,9 @@ Simply copy the `example-folder` into your own project, then change the followin
 
 ## Credits
 ### Programming
-MrGerund (AKA The Flying Dutchman)\
+MrGerund (AKA The Flying Dutchman)
 WINRARisyou (Assistant Developer)
+
+### Translations
+Dutch - MrGerund
+Spanish, French & Japanese - Edwrin (AKA Skopler)
