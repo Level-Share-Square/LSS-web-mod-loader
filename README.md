@@ -23,3 +23,9 @@ WINRARisyou (Assistant Developer)
 ### Translations
 Dutch - MrGerund
 Spanish, French & Japanese - Edwrin (AKA Skopler)
+
+### Testing
+Popthatcorn14
+Bluseven
+AnonymousEpitaph
+Edwrin
