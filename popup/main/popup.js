@@ -34,18 +34,22 @@ document.getElementById("openManagerButton").addEventListener("click", () => {
 // custom message if game is detected and the window pops up
 document.addEventListener("DOMContentLoaded", async () => {
   chrome.storage.session.get("gameDetected", (data) => {
-    // modify the popup
     if (data.gameDetected) {
       const header = document.getElementById("header");
       header.innerHTML = chrome.i18n.getMessage("game_detected_header");
-      // prevent fullscreen
-      window.addEventListener("blur", () => {
-        if (window.devMode) return;
-        window.close();
+
+      // Close popup if clicked outside
+      document.addEventListener("visibilitychange", (event) => {
+        // Only perform outside of devmode
+        if (!window.devMode && document.hidden) {
+          window.close();
+        }
       });
+
       chrome.storage.session.set({ gameDetected: false });
     }
   });
+
   // map the mods
   getGameVer().then(() => displayMods());
 });
