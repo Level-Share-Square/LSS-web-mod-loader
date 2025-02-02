@@ -1,4 +1,4 @@
-const extension = chrome;
+const extension = typeof browser !== "undefined" ? browser : chrome;
 document.title = extension.i18n.getMessage("extension_name");
 
 const targets = [

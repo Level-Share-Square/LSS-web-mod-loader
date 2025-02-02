@@ -1,5 +1,5 @@
 window.devmode = false;
-const extension = chrome;
+const extension = typeof browser !== "undefined" ? browser : chrome;
 
 let pathname = window.location.pathname;
 let isObserverConnected = true;

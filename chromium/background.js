@@ -1,6 +1,7 @@
 let devmode = false;
-const extension = chrome;
+const extension = typeof browser !== "undefined" ? browser : chrome;
 
+console.log(extension);
 const CONSTANTS = {
   REMOVE_MOD: "REMOVE_MOD",
   MOD_REMOVED: "MOD_REMOVED",
