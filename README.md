@@ -1,7 +1,8 @@
 # Level Share Square Web Mod Loader v1.0
 
-This extension serves as a method of loading mods for the Super Mario Construct web version, don't use it for the desktop version.
-Mods may no longer works in versions they weren't made for, keep in mind to only load mods of the same version or versions without major changes.
+This extension serves as a method of loading mods for web/html5 games which host their files in an accessible manner. 
+Mods may no longer work in versions which they weren't made for, keep in mind to only load mods of the same version or versions without major changes.
+This tool was made with games hosted on Level Share Square kept in mind, but it will work for most other non-web assembly based games.
 
 ## Loading mods
 
