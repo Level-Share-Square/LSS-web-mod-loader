@@ -2,6 +2,9 @@
   "extension_name": {
     "message": "Gestor de Mods web de LSS"
   },
+  "extension_description": {
+    "message": "Un cargador de mods para juegos web/HTML5 de Level Share Square."
+  },
   "header_main": {
     "message": "Gestor de Mods web de LSS"
   },
@@ -101,5 +104,8 @@
   },
   "click_to_enable": {
     "message": "Haz clic para habilitar este mod"
+  },
+  "duplicate_key_warning": {
+    "message": "¡Tu archivo loader.json no puede contener llaves de carpeta raíz que sean exactamente iguales a las llaves normales!"
   }
 }
