@@ -2,6 +2,9 @@
   "extension_name": {
     "message": "Chargeur de Mods web LSS"
   },
+  "extension_description": {
+    "message": "Un chargeur de mods pour les jeux web/HTML5 de Level Share Square."
+  },
   "header_main": {
     "message": "Chargeur de Mods web LSS"
   },
@@ -101,5 +104,8 @@
   },
   "click_to_enable": {
     "message": "Cliquer ici pout désactiver cet mod"
+  },
+  "duplicate_key_warning": {
+    "message": "Ton fichier loader.json ne peut pas contenir des clés de dossier racine qui sont exactement les mêmes que des clés normales !"
   }
 }
