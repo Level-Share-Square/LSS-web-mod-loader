@@ -7,10 +7,10 @@ Example `loader.json` file:
 ```json
 {
   "Version": "1.0", // mod version
-  "GameAbbreviation": "SMC", // game acronym
+  "GameAbbreviation": "<ACRONYM_HERE>", // game acronym
   "Name": "Spaghbettle", // name of your mod (naming must remain consistent)
-  "GameVersion": "v8.beta29.4", // gameversion your mod was built under
-  "BaseURL": "https://levelsharesquare.com/html5/supermarioconstruct/", // game host URL
+  "GameVersion": "<GAME_VERSION_HERE>>", // gameversion your mod was built under
+  "BaseURL": "https://levelsharesquare.com/<GAME_PATH_HERE>/", // game host URL
   "RootFolder": { "images": ["images/", "img"] } // folder (key) to look into to replace a sub directory (value1) and contents (value2)
 }
 ```
