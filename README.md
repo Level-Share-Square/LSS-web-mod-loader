@@ -33,7 +33,7 @@ The second value in your key within `RootFolder` MUST be of type **img**, none o
 
 ## Credits
 ### Programming
-MrGerund (AKA The Flying Dutchman)
+MrGerund (AKA The Flying Dutchman)<br />
 WINRARisyou (Assistant Developer)
 
 ### Translations
