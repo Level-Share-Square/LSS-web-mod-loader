@@ -8,11 +8,10 @@
     "scripting",
     "storage",
     "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess",
     "tabs"
   ],
   "default_locale": "en",
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": ["https://levelsharesquare.com/"],
   "icons": {
     "16": "assets/icons/icon-16.png",
     "48": "assets/icons/icon-48.png",
