@@ -1,7 +1,6 @@
 let devmode = true;
 const extension = typeof browser !== "undefined" ? browser : chrome;
 
-console.log(extension);
 const CONSTANTS = {
   REMOVE_MOD: "REMOVE_MOD",
   MOD_REMOVED: "MOD_REMOVED",
@@ -240,7 +239,7 @@ const reloadModRules = () => {
  * ruleset has been updated.
  * @return {boolean} True if the dynamic ruleset was updated successfully.
  */
-const handleDynamicRuleUpdate = (newImages, resolve, oldImages) => {
+const handleDynamicRuleUpdate = (newImages, resolve) => {
   // define the rules
   const newRules = newImages.map(({ data, path }, index) => ({
     id: index + 1,
@@ -271,19 +270,6 @@ const handleDynamicRuleUpdate = (newImages, resolve, oldImages) => {
       addRules: newRules,
     },
     () => resolve()
-  );
-  // refetch files to force cache update
-  oldImages.forEach(({ name, folder, targetPath }) =>
-    fetch(`${targetPath}${folder}${name}`, {
-      method: "GET",
-      cache: "reload", // Forces bypassing the HTTP cache
-      headers: {
-        pragma: "no-cache",
-        "cache-control": "no-cache, no-store, must-revalidate",
-      },
-    })
-      .then((res) => devmode && console.log(res))
-      .catch((err) => devmode && console.log(err))
   );
   // indicate async success
   return true;
