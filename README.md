@@ -17,7 +17,7 @@ Simply copy the `example-mod-folder` into your own project, then change the foll
 - `GameVersion`: The version of the game your mod was made for, latest game versions can be found in the mod manager menu.
 - `BaseURL`: The original URL of where the game is located. Used to retrieve the old assets.
 - `RootFolder`: The folder in which the extension will look for, used in combination with `RootFolder` to find the original assets:
-    - `images`: This will look for the _BaseURL/images/_ original images in the folder corresponding to its value.
+    - `"key":"value/"`: This will request `BaseURL/value/` for the original image, then replace it with the contents of mod folder `key`.
                 
 RootFolder example:
 ```json
