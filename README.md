@@ -33,22 +33,16 @@ The second value in your key within `RootFolder` MUST be of type **img**, none o
 
 ## Credits
 ### Programming
-MrGerund (AKA The Flying Dutchman)<br />
-WINRARisyou (Assistant Developer)<br />
+- MrGerund (AKA The Flying Dutchman)
+- WINRARisyou (Assistant Developer)
 
 ### Translations
-
-Dutch - MrGerund
-
-Spanish, French & Japanese - Edwrin (AKA Skopler)
+- MrGerund: Dutch
+- Edwrin (AKA Skopler): Spanish, French & Japanese
 
 ### Testing
-
-Popthatcorn14
-
-Bluseven
-
-AnonymousEpitaph
-
-Edwrin
+- Popthatcorn14
+- Bluseven
+- AnonymousEpitaph
+- Edwrin
 
