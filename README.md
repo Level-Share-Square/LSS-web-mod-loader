@@ -19,7 +19,7 @@ Simply copy the `example-mod-folder` into your own project, then change the foll
 - `GameAbbreviation`: The acronym of the game your mod was made for, supported games can be found in the mod manager menu.
 - `GameVersion`: The version of the game your mod was made for, latest game versions can be found in the mod manager menu.
 - `BaseURL`: The original URL of where the game is located. Used to retrieve the old assets.
-- `RootFolder`: The folder in which the extension will look for, used in combination with `RootFolder` to find the original assets:
+- `RootFolder`: The folder in which the extension will look for, used in combination with `BaseURL` to find the original assets:
     - `"key":["value/",type]`: This will request `BaseURL/value/` for the original image, then replace it with the contents of mod folder `key`.
     - `type`: The expected file type within the folder, which is the "folder tag". Scroll down for all supported tags.
                 
