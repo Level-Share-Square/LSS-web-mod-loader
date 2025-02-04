@@ -21,10 +21,10 @@ Example `loader.json` file:
 - Make sure to remove anything that is left unchanged from the spritesheet to prevent conflicts with other mods.
 - In case the original sprites contain unused portions/stretched bits, you can often safely remove these. Though these kind of structures are often involved with artifact removal within the game.
 - Images can be any of the following extensions:
- - png
- - jpg
- - jpeg
- - webp
+	- png
+	- jpg
+	- jpeg
+	- webp
 
 RootFolders example:
 ```json
