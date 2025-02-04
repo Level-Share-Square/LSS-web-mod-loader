@@ -14,13 +14,17 @@ Example `loader.json` file:
   "RootFolder": { "images": ["images/", "img"] } // folder (key) to look into to replace a sub directory (value1) and contents (value2)
 }
 ```
-**Images must be the same size AND the replaced sprites must be on the same location in the image.**
-Make sure to remove anything that is left unchanged from the spritesheet to prevent conflicts with other mods.
-Images can be any of the following extensions:
-- png
-- jpg
-- jpeg
-- webp
+
+# Modding images
+- Images must be the same width and height
+- The replaced sprites must be on the same location in the image.
+- Make sure to remove anything that is left unchanged from the spritesheet to prevent conflicts with other mods.
+- In case the original sprites contain unused portions/stretched bits, you can often safely remove these. Though these kind of structures are often involved with artifact removal within the game.
+- Images can be any of the following extensions:
+ - png
+ - jpg
+ - jpeg
+ - webp
 
 RootFolders example:
 ```json
