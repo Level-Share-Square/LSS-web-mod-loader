@@ -4,7 +4,10 @@ This extension serves as a method of loading mods for web/html5 games which host
 Mods may no longer work in versions which they weren't made for, keep in mind to only load mods of the same version or versions without major changes.
 This tool was made with games hosted on Level Share Square kept in mind, but it will work for most other non-web assembly based games.
 
-## Loading mods
+## Setup & Loading mods
+
+Watch the setup guide on how to get the extension working and resolve issues:
+https://youtu.be/bUdqeRQhTFc
 
 To load your mod, simply open the extension, then click "manager". After that, you can upload the mod folder and click "Load Modpack", which will automatically load it. Modpacks will only work if they have a properly configured `loader.json` file inside.
 
