@@ -35,6 +35,10 @@
     "message": "CTRL+SHIFT+R will reload the game without cached images, forcing mods to be enabled.",
     "description": "The tooltip of the button to give information about hard reload"
   },
+  "reload_mods_error": {
+    "message": "Error reloading mods, try refreshing and/or opening a different page.",
+    "description": "Error message if reloading mods fails."
+  },
   "close_popup": {
     "message": "Close",
     "description": "The name of the button to close the popup"

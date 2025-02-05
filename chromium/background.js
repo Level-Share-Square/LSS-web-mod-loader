@@ -1,4 +1,4 @@
-let devmode = true;
+let devmode = false;
 const extension = typeof browser !== "undefined" ? browser : chrome;
 
 const CONSTANTS = {

@@ -26,6 +26,9 @@
   "reload_mods_tooltip": {
     "message": "CTRL+SHIFT+R herlaad de afbeeldingen en de scripts van het spel, inclusief de mods."
   },
+  "reload_mods_error": {
+    "message": "Er is een fout opgetreden met het herladen van de mods, probeer te verversen of een andere pagina te openen."
+  },
   "close_popup": {
     "message": "Sluiten"
   },
