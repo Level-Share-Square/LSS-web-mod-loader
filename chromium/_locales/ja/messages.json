@@ -26,6 +26,9 @@
   "reload_mods_tooltip": {
     "message": "CTRL+SHIFT+Rはキャッシュ画像なしでゲームをリロードし、MODを強制的に有効にします。"
   },
+  "reload_mods_error": {
+    "message": MODのリロードエラー。リフレッシュするか、別のページを開いてみてください。"
+  },
   "close_popup": {
     "message": "閉じる"
   },
