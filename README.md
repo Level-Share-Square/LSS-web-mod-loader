@@ -23,18 +23,24 @@ Simply copy the `example-mod-folder` into your own project, then change the foll
     - `"key":["value/",type]`: This will request `BaseURL/value/` for the original image, then replace it with the contents of mod folder `key`.
     - `type`: The expected file type within the folder, which is the "folder tag". Scroll down for all supported tags.
                 
-RootFolder example:
+RootFolders example:
 ```json
 {
 	"BaseURL": "https://example.com/",
-	"RootFolder": {"assets":["images/", "img"]}
+	"RootFolder": {
+      "assets":["images/", "img"],
+      "palettes":["Palettes/", "json"]}
 }
 ```
-This will target __https://example.com/images/[assets_folder_contents_of_your_mod]__ and expect images in your folder
+This will target:
+- `https://example.com/images/<assets_folder_contents_of_your_mod>` and expect images in the folder
+- `https://example.com/Palettes/<palettes_folder_contents_of_your_mod>` and expect JSON files in the folder
 
 ### Supported folder tags
 
-The second value in your key within `RootFolder` MUST be of type **img**, none other are currently supported.
+The second value in your key within `RootFolder` contains the expected filetype in the folder:
+- `img` looks for images such as `.png`, `.jpg`, `.webp`, etc.
+- `json` looks for json files, which can store code such as layouts, positions, palettes, etc.
 
 ## Credits
 ### Programming

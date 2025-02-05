@@ -25,15 +25,20 @@ Example `loader.json` file:
 	- jpg
 	- jpeg
 	- webp
+- JSON keys can target ANY key in the file, granted the highest keys (most to the left) will be targetted first.
 
 RootFolders example:
 ```json
 {
 	"BaseURL": "https://example.com/",
-	"RootFolder": {"assets":["images/", "img"]}
+	"RootFolder": {
+      "assets":["images/", "img"],
+      "palettes":["Palettes/", "json"]}
 }
 ```
-This will target _https://example.com/images/[assets_folder_contents_of_your_mod]_ and expect images in the folder
+This will target:
+- `https://example.com/images/<assets_folder_contents_of_your_mod>` and expect images in the folder
+- `https://example.com/Palettes/<palettes_folder_contents_of_your_mod>` and expect JSON files in the folder
 
 To load your modpack, use the extension to load the folder and make sure you configured `loader.json`
 Keep in mind mods are *NOT* guaranteed to be compatible with future versions of the game you made it for, or with other mods in general.

@@ -13,10 +13,8 @@ const CONSTANTS = {
   RELOAD_GAME: "RELOAD_GAME",
   RELOAD_MODS: "RELOAD_MODS",
   PROCESS_IMAGES: "PROCESS_IMAGES",
+  DECIMATE_SERVICE_WORKER: "DECIMATE_SERVICE_WORKER",
 };
-
-let replaceRoot = "https://levelsharesquare.com/html5/supermarioconstruct/";
-const imageRoot = "images/";
 
 extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // getting constants
@@ -72,8 +70,24 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   // refreshing mod rules
   if (message.type === CONSTANTS.RELOAD_MODS) {
-    reloadModRules().then(() => {
-      sendResponse({ type: CONSTANTS.MODS_RELOADED });
+    reloadModRules().then(async () => {
+      const activeTabs = await extension.tabs.query({ active: true });
+      // Wait for all window queries to resolve
+      const windows = await Promise.all(
+        activeTabs.map((tab) => extension.windows.get(tab.windowId))
+      );
+      // Filter only normal windows
+      const tabs = activeTabs.filter(
+        (_, index) => windows[index].type === "normal"
+      );
+      // send a message to be picked up by content.js
+      extension.tabs.sendMessage(
+        tabs[0].id,
+        { type: CONSTANTS.DECIMATE_SERVICE_WORKER },
+        // resolve when the response is received
+        () => sendResponse({ type: CONSTANTS.MODS_RELOADED })
+      );
+      return true;
     });
     return true; // async response
   }
@@ -92,9 +106,9 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * @return {Promise<void>} - A promise that resolves when the dynamic rules have
  * been updated or cleared.
  */
-const reloadModRules = (sender) => {
+const reloadModRules = () => {
   return new Promise(async (resolve) => {
-    const imageMap = {};
+    const fileMap = {};
 
     // load the mods
     const result = await new Promise((resolve) => {
@@ -102,6 +116,7 @@ const reloadModRules = (sender) => {
     });
     const allMods =
       Object.entries(result).map(([name, mod]) => ({ name, ...mod })) || [];
+    // only use enabled mods
     const mods = allMods.filter((mod) => mod.enabled);
 
     // loop through the mods and their entries to get all /ORIGIN/ files
@@ -121,23 +136,23 @@ const reloadModRules = (sender) => {
         )
           return;
 
-        Object.entries(object).forEach(([imageName, dataArray]) => {
+        Object.entries(object).forEach(([fileName, dataArray]) => {
           // create a new entry in the map if it doesn't exist
           if (
-            !imageMap[imageName] &&
-            imageMap?.[imageName]?.targetPath !== mod.targetPath
+            !fileMap[fileName] &&
+            fileMap?.[fileName]?.targetPath !== mod.targetPath
           ) {
-            imageMap[imageName] = {
-              name: imageName,
+            fileMap[fileName] = {
+              name: fileName,
               folder: pathName,
               targetPath: mod.targetPath,
             };
           }
           // exclude name key
-          const index = Object.keys(imageMap[imageName]).length - 1;
+          const index = Object.keys(fileMap[fileName]).length - 1;
           // add image if it is enabled
           if (dataArray[1] === true)
-            imageMap[imageName][index] = [
+            fileMap[fileName][index] = [
               ...dataArray,
               mod.name, // add the mod name to identify defects
             ];
@@ -145,7 +160,7 @@ const reloadModRules = (sender) => {
       });
     }
     // to array
-    let images = Object.values(imageMap);
+    let filesToProcess = Object.values(fileMap);
 
     // Function to convert Blob to Base64
     const blobToBase64 = (blob) => {
@@ -162,10 +177,68 @@ const reloadModRules = (sender) => {
     };
 
     // remove all existing rules first
+    await resetDeclaredRules();
+
+    // first get the original files
+    for (let i = 0; i < filesToProcess.length; i++) {
+      // define the image and fetch the original copy
+      const file = filesToProcess[i];
+      const fullPath = `${file.targetPath}${file.folder}${file.name}`;
+      const originalFile = await fetch(fullPath);
+      // Get the Blob from the response
+      const blobImage = await originalFile.blob();
+      // Convert Blob to Base64
+      const base64Image = await blobToBase64(blobImage);
+      // Store the Base64 string in your file array if no error page was returned
+      if (!base64Image.startsWith("data:text/html;base64")) {
+        const numberKey = Object.keys(file).find(
+          (key) => !isNaN(parseInt(key))
+        );
+        file.type = file[numberKey][2]; // file type is within base 64 array
+        file.originalFile = base64Image;
+        filesToProcess[i] = file;
+        // remove entries without original
+      } else delete filesToProcess[i];
+    }
+    // rid of empty entries
+    filesToProcess = filesToProcess.filter((file) => file !== undefined);
+    const images = filesToProcess.filter((file) => file.type === "img");
+    filesToProcess = filesToProcess.filter((file) => file.type !== "img");
+    // send a message to be picked up by content.js
+    extension.runtime.sendMessage(
+      {
+        type: CONSTANTS.PROCESS_IMAGES,
+        images,
+      },
+      (imageResponse) => {
+        const newImages = imageResponse?.newImages || [];
+        let processedFiles = [];
+
+        // process JSON files if applicable
+        if (filesToProcess.length) {
+          processedFiles = processFiles(filesToProcess);
+        }
+
+        // end if no response
+        if (!newImages.length && !filesToProcess.length) {
+          if (devmode) console.log("Cleared all rules!");
+          return resolve();
+        }
+
+        const allModdedFiles = [...newImages, ...processedFiles];
+        // clean up all rules before making new ones
+        handleDynamicRuleUpdate(allModdedFiles, resolve);
+      }
+    );
+  });
+};
+
+const resetDeclaredRules = () => {
+  return new Promise(async (resolve) => {
     const rules =
       (await extension.declarativeNetRequest.getDynamicRules()) || [];
     const ruleIds = rules.map((rule) => rule.id);
-    // create a bypass for the images of the previous rules
+    // create a bypass for the files of the previous rules
     const pathArray =
       rules.map((rule) => escapeRegex(rule.condition.urlFilter)) || null;
 
@@ -180,45 +253,73 @@ const reloadModRules = (sender) => {
         ? { addRules: [generateCacheBypassRule(pathArray)] }
         : {}),
     });
-
-    // first get the original images
-    for (let i = 0; i < images.length; i++) {
-      // define the image and fetch the original copy
-      const image = images[i];
-      const fullPath = `${image.targetPath}${image.folder}${image.name}`;
-      const originalImage = await fetch(fullPath);
-      // Get the Blob from the response
-      const blobImage = await originalImage.blob();
-      // Convert Blob to Base64
-      const base64Image = await blobToBase64(blobImage);
-      // Store the Base64 string in your images array if no error page was returned
-      if (!base64Image.startsWith("data:text/html;base64")) {
-        image.originalImage = base64Image;
-        images[i] = image;
-        // remove entries without original
-      } else delete images[i];
-    }
-    // rid of empty entries
-    images = images.filter((image) => image !== undefined);
-    // send a message to be picked up by content.js
-    extension.runtime.sendMessage(
-      {
-        type: CONSTANTS.PROCESS_IMAGES,
-        images,
-      },
-      (imageResponse) => {
-        const newImages = imageResponse?.newImages || null;
-        // end if no response
-        if (!newImages || newImages.length === 0) {
-          if (devmode) console.log("Cleared all rules!");
-          return resolve();
-        }
-
-        // clean up all rules before making new ones
-        handleDynamicRuleUpdate(newImages, resolve, images);
-      }
-    );
+    resolve();
   });
+};
+
+/**
+ * Recursively replaces values in an object with values from another object.
+ * @param {Object} target The object to replace values in.
+ * @param {Object} source The object to take values from.
+ * @param {Object} keys The object containing the keys to replace.
+ * @returns {Object} The modified target object.
+ */
+const deepReplace = (target, source, keys) => {
+  // If the target or source object is not an object, return the target
+  if (!target || typeof target !== "object") return target;
+  if (!source || typeof source !== "object") return target;
+
+  // Loop through the target object
+  for (const key of Object.keys(target)) {
+    if (keys.includes(key) && key in source) {
+      target[key] = source[key]; // Replace key
+    } else if (typeof target[key] === "object") {
+      target[key] = deepReplace(target[key], source, keys); // Recurse
+    }
+  }
+  // Return the modified target
+  return target;
+};
+
+const processFiles = (files) => {
+  const pathFiles = [];
+
+  for (let i = 0; i < files.length; i++) {
+    // only process JSON
+    const file = files[i];
+
+    if (file.type !== "json") continue;
+    // get the entry with the array buffer
+    const fileDataArray = Object.entries(file).filter(
+      ([key, _]) => !isNaN(parseInt(key))
+    );
+    if (fileDataArray.length === 0) continue;
+    const encodeInfo = file.originalFile.split(",")[0];
+    let originalJSON = JSON.parse(atob(file.originalFile.split(",")[1])); // Original JSON
+
+    console.log(originalJSON.data["1_Bonus"], originalJSON.data["2_Bonus"]);
+    // Replace any key in the original object with the keys of the new files
+    for (const dataArray of fileDataArray) {
+      // extract JSON array from data array, then parse the base64 string in the first slot
+      const fileData = JSON.parse(atob(dataArray[1][0].split(",")[1]));
+
+      // Deep replace any key in the original object
+      const resultJSON = deepReplace(
+        originalJSON,
+        fileData,
+        Object.keys(fileData)
+      );
+
+      originalJSON = resultJSON;
+      console.log(originalJSON.data["1_Bonus"], originalJSON.data["2_Bonus"]);
+    }
+    const newJSON = JSON.stringify(originalJSON);
+    const data = btoa(newJSON);
+
+    pathFiles.push({ path: file.name, data: encodeInfo + "," + data });
+  }
+
+  return pathFiles;
 };
 
 /**
@@ -232,9 +333,9 @@ const reloadModRules = (sender) => {
  * ruleset has been updated.
  * @return {boolean} True if the dynamic ruleset was updated successfully.
  */
-const handleDynamicRuleUpdate = (newImages, resolve) => {
+const handleDynamicRuleUpdate = (allModdedFiles, resolve) => {
   // define the rules
-  const newRules = newImages.map(({ data, path }, index) => ({
+  const newRules = allModdedFiles.map(({ data, path }, index) => ({
     id: index + 1,
     priority: 1,
     action: {
@@ -247,7 +348,7 @@ const handleDynamicRuleUpdate = (newImages, resolve) => {
     },
   }));
   // map all paths into a regex
-  const pathArray = newImages.map(({ path }) => escapeRegex(path));
+  const pathArray = allModdedFiles.map(({ path }) => escapeRegex(path));
   // define a cache bypass rule
   const cacheBypassRule = generateCacheBypassRule(pathArray);
   // push it into the new rules

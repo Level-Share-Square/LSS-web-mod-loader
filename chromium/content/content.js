@@ -73,5 +73,10 @@ extension.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
       if (iframe !== null) iframe.contentWindow.location.reload();
       return;
     }
+    // decimate the service worker
+    if (message.type === CONSTANTS.DECIMATE_SERVICE_WORKER) {
+      sendResponse();
+      return;
+    }
   });
 });

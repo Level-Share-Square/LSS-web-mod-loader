@@ -113,31 +113,44 @@ document
       const rootFolderValues = Object.keys(RootFolder);
 
       let images = [];
+      let jsons = [];
       for (const key of rootFolderValues) {
         const normalizedImageRoot = `${folderName}/${key}`.replace(/\/$/, "");
+        const type = RootFolder?.[key]?.[1] || null;
 
         //! enforce image type
-        if (RootFolder?.[key]?.[1] !== "img" || !RootFolder?.[key]?.[1]) {
-          alert("Type must be img");
+        if (type === null || !["img", "json"].includes(type)) {
+          alert("Type must be img or json");
           return;
         }
 
         // Get all images in the folder
-        images = Array.from(fileInput.files)
-          .map((file) => ({ file, key })) // convert to array of objects
-          .filter(({ file }) => {
-            return (
-              // filter out non-images
-              file.webkitRelativePath.startsWith(normalizedImageRoot) &&
-              /\.(png|jpg|jpeg|webp)$/i.test(file.name)
+        if (type === "img")
+          images = Array.from(fileInput.files)
+            .map((file) => ({ file, key })) // convert to array of objects
+            .filter(
+              ({ file }) =>
+                // filter out non-images
+                file.webkitRelativePath.startsWith(normalizedImageRoot) &&
+                /\.(png|jpg|jpeg|webp)$/i.test(file.name)
             );
-          });
 
-        // Check if there are any images
-        if (images.length === 0) {
-          alert(extension.i18n.getMessage("imageroot_warning"));
-          return;
-        }
+        // get all jsons in the folder
+        if (type === "json")
+          jsons = Array.from(fileInput.files)
+            .map((file) => ({ file, key })) // convert to array of objects
+            .filter(
+              ({ file }) =>
+                // filter out non-images
+                file.webkitRelativePath.startsWith(normalizedImageRoot) &&
+                /\.json$/i.test(file.name)
+            );
+      }
+
+      // return if nothing was found
+      if (images.length === 0 && jsons.length === 0) {
+        alert(extension.i18n.getMessage("imageroot_warning"));
+        return;
       }
 
       const rootFolderPaths = // path becomes key for empty object
@@ -168,36 +181,39 @@ document
         ...Object.assign({}, ...rootFolderPaths), // define the root folder keys
         enabled: true,
       };
-
-      // Process each image
+      // merge
+      const allFiles = [...images, ...jsons];
+      // Process each file
       for (const key of rootFolderValues) {
-        for (const imageObj of images) {
-          // may sure key belongs to the image
-          if (imageObj.key !== key) continue;
+        for (const fileObj of allFiles) {
+          // may sure key belongs to the file
+          if (fileObj.key !== key) continue;
           const normalizedImageRoot = `${folderName}/${key}`.replace(/\/$/, "");
-          // set image path
-          const image = imageObj.file;
-          const imageReader = new FileReader();
-          const imagePath = image.webkitRelativePath.replace(
+          // set file path
+          const file = fileObj.file;
+          const fileReader = new FileReader();
+          const filePath = file.webkitRelativePath.replace(
             normalizedImageRoot + "/",
             ""
           );
 
           // Convert image to base64
           const base64 = await new Promise((resolve) => {
-            imageReader.onload = () => {
-              resolve(imageReader.result.replace(/^.+,/, ""));
+            fileReader.onload = () => {
+              resolve(fileReader.result.replace(/^.+,/, ""));
             };
-            imageReader.readAsDataURL(image);
+            fileReader.readAsDataURL(file);
           });
 
           const folderTarget = RootFolder[key][0];
           const fileType = RootFolder[key][1];
-          // Overwrite images completely
-          newMod[folderTarget][imagePath] = [
-            `data:image/${image.type.split("/")[1]};base64,${base64}`,
+          const dataType = fileType === "img" ? "image" : "application";
+          const mimeType = `${dataType}/${file.type.split("/")[1]}`;
+          // Overwrite files completely
+          newMod[folderTarget][filePath] = [
+            `data:${mimeType};base64,${base64}`,
             true, // Enabled
-            fileType, // img, (currently no other types)
+            fileType, // folder tag
           ];
         }
       }

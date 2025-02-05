@@ -289,7 +289,7 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
       try {
         // draw new image
         const modifiedImage = await loadAndModifyImage(
-          image.originalImage,
+          image.originalFile,
           base64Arrays
         );
         // successfully return an object with the data and path
