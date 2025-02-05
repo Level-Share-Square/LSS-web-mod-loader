@@ -120,7 +120,7 @@ const createRemoveButton = (mod, listItem) => {
     if (!proceed) return;
     // make a call to the background to remove the mod
     extension.runtime.sendMessage(
-      { type: CONSTANTS.REMOVE_MOD, name: mod.name },
+      { type: CONSTANTS.REMOVE_MOD, mod: mod },
       (response) => {
         if (response.type === CONSTANTS.MOD_REMOVED) {
           listItem.remove();
@@ -172,7 +172,7 @@ const createToggleButton = (mod) => {
     //tell background.js to reload the mods
     try {
       extension.runtime.sendMessage(
-        { type: CONSTANTS.TOGGLE_MOD, name: mod.name, mod: mod },
+        { type: CONSTANTS.TOGGLE_MOD, mod: mod },
         (response) => {
           if (response.type === CONSTANTS.MOD_TOGGLED) {
             // update message
@@ -273,3 +273,150 @@ const reloadMods = () => {
 };
 
 if (reloadModsButton) reloadModsButton.addEventListener("click", reloadMods);
+
+// listen for messages from background.js
+extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // process images for mod rule reloading
+  if (message.type === CONSTANTS.PROCESS_IMAGES) {
+    const images = message.images;
+    //loop through the images
+    const imageProcessingPromises = images.map(async (image) => {
+      // get all base64 images
+      const base64Arrays = Object.entries(image)
+        .filter(([key, _]) => !isNaN(key)) // Only numeric keys
+        .map(([_, value]) => value[0]); // Get base64 string
+
+      try {
+        // draw new image
+        const modifiedImage = await loadAndModifyImage(
+          image.originalImage,
+          base64Arrays
+        );
+        // successfully return an object with the data and path
+        return {
+          data: modifiedImage,
+          path: `${image.name}`,
+        };
+      } catch (error) {
+        console.error("Error processing image:", error);
+        return null; // Skip failed images
+      }
+    });
+    // use Promise.all to wait for all image processing to complete
+    Promise.all(imageProcessingPromises).then((base64Arrays) => {
+      // Filter out failed (null) images
+      const validImages = base64Arrays.filter((img) => img !== null);
+      sendResponse({ newImages: validImages }); // Send the processed images
+    });
+    return true;
+  }
+});
+
+/**
+ * Loads an original image and overlays it with a set of modified images.
+ *
+ * The function creates a canvas element, draws the original image onto it,
+ * and then processes each modified image as an overlay. For each overlay,
+ * it clears 16x16 pixel blocks on the canvas wherever the overlay has non-transparent
+ * pixels, then draws the overlay image onto the main canvas. Once all overlays
+ * are processed, it returns the final image as a Base64 string in a lossless format.
+ *
+ * @param {string} original - The original image in Base64 format.
+ * @param {Array<string>} modified - An array of modified images in Base64 format to overlay.
+ * @returns {Promise<string>} A promise that resolves to the final image as a Base64 string.
+ */
+
+const loadAndModifyImage = (original, modified) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = original;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // Set canvas size to match the original image
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw the original image onto the canvas
+      ctx.drawImage(img, 0, 0);
+
+      // Process all overlays
+      const overlayPromises = modified.map((base64Overlay) => {
+        return new Promise((resolveOverlay, rejectOverlay) => {
+          const overlayImg = new Image();
+          overlayImg.src = base64Overlay;
+
+          overlayImg.onload = () => {
+            const offCanvas = document.createElement("canvas");
+            const offCtx = offCanvas.getContext("2d");
+
+            // Match overlay size
+            offCanvas.width = overlayImg.width;
+            offCanvas.height = overlayImg.height;
+
+            // Draw overlay to an offscreen canvas
+            offCtx.drawImage(overlayImg, 0, 0);
+
+            // Get pixel data
+            const imageData = offCtx.getImageData(
+              0,
+              0,
+              overlayImg.width,
+              overlayImg.height
+            );
+            const pixels = imageData.data;
+
+            // Iterate through pixels and clear corresponding 16x16 areas on the main canvas
+            for (let y = 0; y < overlayImg.height; y++) {
+              for (let x = 0; x < overlayImg.width; x++) {
+                const index = (y * overlayImg.width + x) * 4;
+                const alpha = pixels[index + 3]; // Alpha channel
+
+                if (alpha > 0) {
+                  // If pixel is not fully transparent
+                  // Get the top-left corner of the 16x16 block
+                  let blockX = Math.floor(x / 16) * 16;
+                  let blockY = Math.floor(y / 16) * 16;
+
+                  // Ensure we don't go outside the canvas bounds
+                  let clearWidth = Math.min(16, canvas.width - blockX);
+                  let clearHeight = Math.min(16, canvas.height - blockY);
+
+                  ctx.clearRect(blockX, blockY, clearWidth, clearHeight);
+                }
+              }
+            }
+
+            // Draw the overlay image onto the main canvas
+            ctx.drawImage(
+              overlayImg,
+              0,
+              0,
+              overlayImg.width,
+              overlayImg.height
+            );
+            resolveOverlay();
+          };
+
+          overlayImg.onerror = rejectOverlay;
+        });
+      });
+
+      // Wait for all overlays to finish
+      Promise.all(overlayPromises)
+        .then(() => {
+          // Get original file extension from base64 string
+          const fileType = original.split(";")[0].split(":")[1];
+
+          // Once overlays are done, get the final image as Base64 in lossless format
+          const finalImage = canvas.toDataURL(fileType, 1);
+          resolve(finalImage);
+        })
+        .catch(reject);
+    };
+
+    img.onerror = reject;
+  });
+};

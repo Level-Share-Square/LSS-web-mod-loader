@@ -56,22 +56,26 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     });
   }
-
+  // removing a mod
   if (message.type === CONSTANTS.REMOVE_MOD) {
-    removeMod(message.name, sendResponse);
-    sendResponse({ type: CONSTANTS.MOD_REMOVED });
+    removeMod(message.mod).then(() =>
+      sendResponse({ type: CONSTANTS.MOD_REMOVED })
+    );
+    return true; // async response
   }
-
+  // toggling a mod
   if (message.type === CONSTANTS.TOGGLE_MOD) {
-    toggleMod(message.name, message.mod, sendResponse);
-    sendResponse({ type: CONSTANTS.MOD_TOGGLED });
+    toggleMod(message.mod).then(() =>
+      sendResponse({ type: CONSTANTS.MOD_TOGGLED })
+    );
+    return true; // async response
   }
-
+  // refreshing mod rules
   if (message.type === CONSTANTS.RELOAD_MODS) {
     reloadModRules().then(() => {
       sendResponse({ type: CONSTANTS.MODS_RELOADED });
     });
-    return true;
+    return true; // async response
   }
 });
 
@@ -88,7 +92,7 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * @return {Promise<void>} - A promise that resolves when the dynamic rules have
  * been updated or cleared.
  */
-const reloadModRules = () => {
+const reloadModRules = (sender) => {
   return new Promise(async (resolve) => {
     const imageMap = {};
 
@@ -196,19 +200,8 @@ const reloadModRules = () => {
     }
     // rid of empty entries
     images = images.filter((image) => image !== undefined);
-    // get the active tab to send a message to in content.js
-    const activeTabs = await extension.tabs.query({
-      active: true,
-    });
-    const windows = await Promise.all(
-      activeTabs.map((tab) => extension.windows.get(tab.windowId))
-    );
-    const tabs = activeTabs.filter(
-      (_, index) => windows[index].type === "normal"
-    );
     // send a message to be picked up by content.js
-    extension.tabs.sendMessage(
-      tabs[0].id,
+    extension.runtime.sendMessage(
       {
         type: CONSTANTS.PROCESS_IMAGES,
         images,
@@ -309,35 +302,26 @@ const generateCacheBypassRule = (pathArray) => {
   };
 };
 
-const removeMod = async (name, sendResponse) => {
-  // Fetch the current mappings
-  extension.storage.local.remove(name);
-  reloadModRules();
+const removeMod = async (mod) => {
+  return new Promise((resolve) => {
+    // Fetch the current mappings
+    extension.storage.local.remove(mod?.name);
+    if (devmode) console.log(`Removed mod: ${mod.name}`, mod);
+    reloadModRules().then(() => resolve());
+  });
 };
 
-const toggleMod = async (name, Mod, sendResponse) => {
-  extension.storage.local.get(null, (result) => {
-    const mods =
-      Object.entries(result).map(([name, mod]) => ({ name, ...mod })) || [];
-
-    // Find and toggle only the mod that matches modName
-    mods.forEach((mod) => {
-      if (mod.name === Mod.name) {
-        mod.enabled = !mod.enabled; // Toggle true/false
-      }
-    });
-
-    // Convert mods back into the format required for storage
-    const updatedMods = mods.reduce((acc, mod) => {
-      acc[mod.name] = { ...mod };
-      delete acc[mod.name].name; // Remove redundant name property
-      return acc;
-    }, {});
-
-    // Save back to extension.storage.local
-    extension.storage.local.set(updatedMods, () => {
-      if (devmode) console.log(`Toggled mod: ${Mod.name}`, updatedMods);
+const toggleMod = (mod) => {
+  return new Promise((resolve) => {
+    extension.storage.local.get(mod.name, (result) => {
+      // get the state from storage, then toggle enabled
+      const newMod = result[mod.name];
+      newMod.enabled = !newMod.enabled;
+      // Save back to extension.storage.local
+      extension.storage.local.set({ [mod.name]: newMod }, () => {
+        if (devmode) console.log(`Toggled mod: ${mod.name}`, mod);
+        resolve();
+      });
     });
   });
-  reloadModRules();
 };
