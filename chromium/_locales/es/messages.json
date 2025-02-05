@@ -26,6 +26,9 @@
   "reload_mods_tooltip": {
     "message": "CTRL+SHIFT+R recargará el juego sin imágenes en caché, forzando la activación de mods."
   },
+  "reload_mods_error": {
+    "message": "Error al recargar mods, intenta refrescar y/o abrir una página diferente."
+  },
   "close_popup": {
     "message": "Cerrar"
   },
