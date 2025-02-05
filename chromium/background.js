@@ -297,7 +297,6 @@ const processFiles = (files) => {
     const encodeInfo = file.originalFile.split(",")[0];
     let originalJSON = JSON.parse(atob(file.originalFile.split(",")[1])); // Original JSON
 
-    console.log(originalJSON.data["1_Bonus"], originalJSON.data["2_Bonus"]);
     // Replace any key in the original object with the keys of the new files
     for (const dataArray of fileDataArray) {
       // extract JSON array from data array, then parse the base64 string in the first slot
@@ -311,7 +310,6 @@ const processFiles = (files) => {
       );
 
       originalJSON = resultJSON;
-      console.log(originalJSON.data["1_Bonus"], originalJSON.data["2_Bonus"]);
     }
     const newJSON = JSON.stringify(originalJSON);
     const data = btoa(newJSON);
