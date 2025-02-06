@@ -28,8 +28,9 @@ RootFolders example:
 {
 	"BaseURL": "https://example.com/",
 	"RootFolder": {
-      "assets":["images/", "img"],
-      "palettes":["Palettes/", "json"]}
+		"assets":["images/", "img"],
+		"palettes":["Palettes/", "json"]
+	}
 }
 ```
 This will target:
@@ -40,7 +41,7 @@ This will target:
 
 The second value in your key within `RootFolder` contains the expected filetype in the folder:
 - `img` looks for images such as `.png`, `.jpg`, `.webp`, etc.
-- `json` looks for json files, which can store code such as layouts, positions, palettes, etc.
+- `json` looks for json files and replace matching keys, files often used for palettes/layouts/etc.
 
 ## Credits
 ### Programming
