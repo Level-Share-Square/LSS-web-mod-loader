@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Close popup if clicked outside
       document.addEventListener("visibilitychange", (event) => {
         // Only perform outside of devmode
-        if (!window.devMode && document.hidden) {
+        if (!window.devmode && document.hidden) {
           window.close();
         }
       });

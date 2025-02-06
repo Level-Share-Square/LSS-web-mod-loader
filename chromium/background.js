@@ -13,7 +13,6 @@ const CONSTANTS = {
   RELOAD_GAME: "RELOAD_GAME",
   RELOAD_MODS: "RELOAD_MODS",
   PROCESS_IMAGES: "PROCESS_IMAGES",
-  DECIMATE_SERVICE_WORKER: "DECIMATE_SERVICE_WORKER",
 };
 
 extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -80,18 +79,74 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const tabs = activeTabs.filter(
         (_, index) => windows[index].type === "normal"
       );
-      // send a message to be picked up by content.js
-      extension.tabs.sendMessage(
-        tabs[0].id,
-        { type: CONSTANTS.DECIMATE_SERVICE_WORKER },
-        // resolve when the response is received
-        () => sendResponse({ type: CONSTANTS.MODS_RELOADED })
-      );
-      return true;
+      // get the mods to pass in
+      const mods = await extension.storage.local.get(null);
+      // script the current tab
+      await extension.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        function: reloadServiceWorkers,
+        args: [mods],
+      });
+      // then send the response
+      sendResponse({ type: CONSTANTS.MODS_RELOADED });
     });
     return true; // async response
   }
 });
+
+const reloadServiceWorkers = (mods) => {
+  return new Promise(async (resolve) => {
+    // loop through mods
+    for (const key in mods) {
+      const mod = mods[key];
+      // loop through the registrations
+      // extract folders from mod of storage
+      const folderArray = Object.keys(mod).filter(
+        (key) =>
+          ![
+            "enabled",
+            "gameAbbreviation",
+            "gameVersion",
+            "targetPath",
+            "version",
+          ].includes(key)
+      );
+      // define deleted request
+      const deletedCache = [];
+      // loop through folders
+      for (const i of folderArray) {
+        const folderPath = mod.targetPath + i;
+        // loop through files in the folder
+        for (file in mod[i]) {
+          // full path to the file
+          const fullFilePath = folderPath + file;
+          // loop through caches
+          await caches.keys().then((cacheNames) => {
+            cacheNames.forEach((cacheName) => {
+              caches.open(cacheName).then((cache) => {
+                cache.keys().then((requests) => {
+                  requests.forEach((request) => {
+                    // if its cached
+                    if (
+                      request.url === fullFilePath &&
+                      deletedCache.indexOf(fullFilePath) === -1
+                    ) {
+                      // delete it
+                      deletedCache.push(fullFilePath);
+                      cache.delete(request);
+                    }
+                  });
+                });
+              });
+            });
+          });
+        }
+      }
+    }
+    // resolve
+    resolve();
+  });
+};
 
 /**
  * Reloads the mod rules by going through all enabled mods, fetching their image
@@ -243,7 +298,7 @@ const resetDeclaredRules = () => {
       rules.map((rule) => escapeRegex(rule.condition.urlFilter)) || null;
 
     // debug
-    if (devmode) console.log(rules, generateCacheBypassRule(pathArray));
+    if (devmode) console.log("Previous rules:", rules);
 
     // update the rules
     await extension.declarativeNetRequest.updateDynamicRules({

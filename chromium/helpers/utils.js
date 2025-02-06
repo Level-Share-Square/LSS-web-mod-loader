@@ -1,4 +1,4 @@
-window.devMode = false;
+window.devmode = false;
 const reloadModsButton = document.getElementById("reloadMods");
 let CONSTANTS;
 let currentGameVersions = [];
@@ -227,7 +227,7 @@ const reloadMods = () => {
             extension.runtime.sendMessage(
               { type: CONSTANTS.RELOAD_MODS },
               () => {
-                if (window.devMode) return;
+                if (window.devmode) return;
                 extension.scripting.executeScript({
                   target: { tabId: tabs[0].id },
                   func: () => location.reload(true), // Forces a full reload, bypassing cache

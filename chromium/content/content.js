@@ -68,14 +68,9 @@ extension.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
       return;
     }
     // reload the iframe
-    if (message.type === CONSTANTS.RELOAD_GAME) {
+    if (message.type === CONSTANTS.RELOAD_GAME && !window.devmode) {
       const iframe = document.getElementById("game") || null;
       if (iframe !== null) iframe.contentWindow.location.reload();
-      return;
-    }
-    // decimate the service worker
-    if (message.type === CONSTANTS.DECIMATE_SERVICE_WORKER) {
-      sendResponse();
       return;
     }
   });
