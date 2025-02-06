@@ -32,8 +32,9 @@ RootFolders example:
 {
 	"BaseURL": "https://example.com/",
 	"RootFolder": {
-      "assets":["images/", "img"],
-      "palettes":["Palettes/", "json"]}
+		"assets":["images/", "img"],
+		"palettes":["Palettes/", "json"]
+	}
 }
 ```
 This will target:
