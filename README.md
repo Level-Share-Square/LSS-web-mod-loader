@@ -1,4 +1,4 @@
-# Level Share Square Web Mod Loader v1.0
+# Level Share Square Web Mod Loader v1.1
 
 This extension serves as a method of loading mods for web/html5 games which host their files in an accessible manner. 
 Mods may no longer work in versions which they weren't made for, keep in mind to only load mods of the same version or versions without major changes.
