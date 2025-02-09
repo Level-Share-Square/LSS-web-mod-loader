@@ -451,7 +451,6 @@ const generateCacheBypassRule = (pathArray) => {
     },
     condition: {
       resourceTypes: ["xmlhttprequest", "image"],
-      regexFilter: regexPattern, // Use regex to match multiple paths
     },
   };
 };
