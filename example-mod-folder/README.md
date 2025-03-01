@@ -14,8 +14,9 @@ Example `loader.json` file:
   "RootFolder": { "images": ["images/", "img"] } // folder (key) to look into to replace a sub directory (value1) and contents (value2)
 }
 ```
-
-# Modding images
+# Modding info
+## Modding images
+- Folder type for images is "img"
 - Images must be the same width and height
 - The replaced sprites must be on the same location in the image.
 - Make sure to remove anything that is left unchanged from the spritesheet to prevent conflicts with other mods.
@@ -25,15 +26,25 @@ Example `loader.json` file:
 	- jpg
 	- jpeg
 	- webp
-- JSON keys can target ANY key in the file, granted the highest keys (most to the left) will be targetted first.
 
-RootFolders example:
+## Modding JSON
+- Folder type for JSON is "json"
+- JSON keys can target ANY key in the file, granted the highest keys (most to the left) will be targetted first.
+- JSON have a structure of `{"key":"value"}`, keys can contain deeper JSON structures with more keys
+
+## Modding any other file
+- The "any" folder type is used for any filetypes without special support
+- Assets will be repaced completely instead of merged with other mods & the original
+- Only use if you want to target files such as vectors, music, binary data, etc.
+
+## RootFolders example
 ```json
 {
 	"BaseURL": "https://example.com/",
 	"RootFolder": {
 		"assets":["images/", "img"],
-		"palettes":["Palettes/", "json"]
+		"palettes":["Palettes/", "json"],
+		"media": ["", "any"]
 	}
 }
 ```

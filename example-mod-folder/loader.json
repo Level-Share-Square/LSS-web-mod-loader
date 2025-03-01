@@ -5,6 +5,8 @@
   "GameVersion": "<GAME_VERSION_HERE>",
   "BaseURL": "https://levelsharesquare.com/html5/<GAME_LOCATION_HERE>/",
   "RootFolder": {
-    "images": "assets/"
+    "images": ["assets/", "img"],
+    "palettes": ["Palettes/", "json"],
+    "sfx": ["media/Global/", "any"]
   }
 }

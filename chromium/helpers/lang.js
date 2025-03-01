@@ -28,6 +28,13 @@ window.addEventListener("DOMContentLoaded", () => {
           target = "reload_mods_reminder";
           extension.storage.session.set({ hardRefreshHint: false });
         }
+        // display version number next to header_main
+        if (target === "header_main") {
+          const version = chrome.runtime.getManifest().version;
+          const titleName = extension.i18n.getMessage(target);
+          element.innerHTML = `${titleName} (${version})`;
+          return
+        }
         // update contents
         element.innerHTML = extension.i18n.getMessage(target);
       }

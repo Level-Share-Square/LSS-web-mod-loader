@@ -72,8 +72,8 @@ document
         const formattedFields =
           missingFields.length > 1
             ? missingFields.slice(0, -1).join(", ") +
-              " and " +
-              missingFields.at(-1)
+            " and " +
+            missingFields.at(-1)
             : missingFields[0];
 
         alert(
@@ -95,9 +95,9 @@ document
           !gv
             ? extension.i18n.getMessage("unknown_game_warning")
             : extension.i18n.getMessage("outdated_mod_warning", [
-                game?.version,
-                result?.GameVersion,
-              ])
+              game?.version,
+              result?.GameVersion,
+            ])
         );
       }
 
@@ -112,15 +112,17 @@ document
       // get all RootFolder keys
       const rootFolderValues = Object.keys(RootFolder);
 
-      let images = [];
-      let jsons = [];
+      let images = [],
+        jsons = [],
+        other = [];
+
       for (const key of rootFolderValues) {
         const normalizedImageRoot = `${folderName}/${key}`.replace(/\/$/, "");
         const type = RootFolder?.[key]?.[1] || null;
 
         //! enforce image type
-        if (type === null || !["img", "json"].includes(type)) {
-          alert("Type must be img or json");
+        if (type === null || !["img", "json", "any"].includes(type)) {
+          alert("Type must be img, json or any");
           return;
         }
 
@@ -145,10 +147,20 @@ document
                 file.webkitRelativePath.startsWith(normalizedImageRoot) &&
                 /\.json$/i.test(file.name)
             );
+
+        // get any file in the folder
+        if (type === "any")
+          other = Array.from(fileInput.files)
+            .map((file) => ({ file, key })) // convert to array of objects
+            .filter(
+              ({ file }) =>
+                // filter out non-images
+                file.webkitRelativePath.startsWith(normalizedImageRoot)
+            );
       }
 
       // return if nothing was found
-      if (images.length === 0 && jsons.length === 0) {
+      if (images.length === 0 && jsons.length === 0 && other.length === 0) {
         alert(extension.i18n.getMessage("imageroot_warning"));
         return;
       }
@@ -182,7 +194,7 @@ document
         enabled: true,
       };
       // merge
-      const allFiles = [...images, ...jsons];
+      const allFiles = [...images, ...jsons, ...other];
       // Process each file
       for (const key of rootFolderValues) {
         for (const fileObj of allFiles) {
@@ -208,7 +220,7 @@ document
           const folderTarget = RootFolder[key][0];
           const fileType = RootFolder[key][1];
           const dataType = fileType === "img" ? "image" : "application";
-          const mimeType = `${dataType}/${file.type.split("/")[1]}`;
+          const mimeType = fileType === "any" ? fileObj.file.type : `${dataType}/${file.type.split("/")[1]}`;
           // Overwrite files completely
           newMod[folderTarget][filePath] = [
             `data:${mimeType};base64,${base64}`,

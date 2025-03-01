@@ -1,4 +1,4 @@
-let devmode = false;
+let devmode = true;
 const extension = typeof browser !== "undefined" ? browser : chrome;
 
 const CONSTANTS = {
@@ -267,12 +267,11 @@ const reloadModRules = () => {
       },
       (imageResponse) => {
         const newImages = imageResponse?.newImages || [];
-        let processedFiles = [];
+        let processedJsonFiles = [], processedOtherFiles = [];
 
-        // process JSON files if applicable
-        if (filesToProcess.length) {
-          processedFiles = processFiles(filesToProcess);
-        }
+        // process the files
+        processedJsonFiles = processJsons(filesToProcess);
+        processedOtherFiles = processOtherFiles(filesToProcess);
 
         // end if no response
         if (!newImages.length && !filesToProcess.length) {
@@ -280,7 +279,7 @@ const reloadModRules = () => {
           return resolve();
         }
 
-        const allModdedFiles = [...newImages, ...processedFiles];
+        const allModdedFiles = [...newImages, ...processedJsonFiles, ...processedOtherFiles];
         // clean up all rules before making new ones
         handleDynamicRuleUpdate(allModdedFiles, resolve);
       }
@@ -288,14 +287,18 @@ const reloadModRules = () => {
   });
 };
 
+/**
+ * Resets all declared rules by getting the list of declared rules and
+ * removing all of them.
+ *
+ * @return {Promise<void>} A promise that resolves when the rules have been
+ * reset.
+ */
 const resetDeclaredRules = () => {
   return new Promise(async (resolve) => {
     const rules =
       (await extension.declarativeNetRequest.getDynamicRules()) || [];
     const ruleIds = rules.map((rule) => rule.id);
-    // create a bypass for the files of the previous rules
-    const pathArray =
-      rules.map((rule) => escapeRegex(rule.condition.urlFilter)) || null;
 
     // debug
     if (devmode) console.log("Previous rules:", rules);
@@ -303,10 +306,6 @@ const resetDeclaredRules = () => {
     // update the rules
     await extension.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: ruleIds,
-      // add a cache bypass rule if applicable
-      ...(pathArray !== null && pathArray?.length
-        ? { addRules: [generateCacheBypassRule(pathArray)] }
-        : {}),
     });
     resolve();
   });
@@ -336,8 +335,26 @@ const deepReplace = (target, source, keys) => {
   return target;
 };
 
-const processFiles = (files) => {
+/**
+ * Processes an array of file objects from the mod folder and returns a new array
+ * of file objects with the JSON data replaced according to the rules of the
+ * replacement JSON files. The function takes an array of file objects as follows:
+ * [
+ *   { path: "path/to/file.json", type: "json", originalFile: "data:application/json;base64,..." },
+ *   { path: "path/to/other/file.json", type: "json", originalFile: "data:application/json;base64,..." },
+ * ]
+ *
+ * The function will return an array of file objects with the same paths and
+ * types, but with the JSON data replaced according to the rules of the
+ * replacement JSON files.
+ * @param {Object[]} files The array of file objects to process.
+ * @returns {Object[]} The array of file objects with the JSON data replaced.
+ */
+const processJsons = (files) => {
   const pathFiles = [];
+
+  // return if empty
+  if (!files?.length) return pathFiles;
 
   for (let i = 0; i < files.length; i++) {
     // only process JSON
@@ -376,6 +393,39 @@ const processFiles = (files) => {
 };
 
 /**
+ * Processes an array of file objects from the mod folder and returns a new array
+ * of file objects with the original file data unchanged. This function takes an
+ * array of file objects as follows:
+ * [
+ *   { name: "path/to/file.any", folder: "path/to/", originalFile: "data:application/any;base64,..." },
+ *   { name: "path/to/other/file.any", folder: "path/to/", originalFile: "data:application/any;base64,..." },
+ * ]
+ *
+ * The function will return an array of file objects with the same paths and
+ * types, but with the original file data unchanged.
+ * @param {Object[]} files The array of file objects to process.
+ * @returns {Object[]} The array of file objects with the original file data unchanged.
+ */
+const processOtherFiles = (files) => {
+  // return if empty
+  if (!files?.length) return [];
+  // define the
+  const pathFiles = files.map((file) => {
+    const path = `${file.folder}${file.name}`;
+    // get the entry with the array buffer
+    const data = Object.entries(file).filter(
+      ([key, _]) => !isNaN(parseInt(key))
+    )[0][1][0];
+    // return the object
+    return {
+      path,
+      data
+    }
+  });
+  return pathFiles;
+}
+
+/**
  * Given an array of new images, defines the dynamic rules and updates the
  * dynamic ruleset. This function is a callback for the promise returned by
  * `updateImages()`.
@@ -400,12 +450,6 @@ const handleDynamicRuleUpdate = (allModdedFiles, resolve) => {
       urlFilter: path,
     },
   }));
-  // map all paths into a regex
-  const pathArray = allModdedFiles.map(({ path }) => escapeRegex(path));
-  // define a cache bypass rule
-  const cacheBypassRule = generateCacheBypassRule(pathArray);
-  // push it into the new rules
-  newRules.push(cacheBypassRule);
 
   // log if in devmode
   if (devmode) console.log(newRules);
@@ -422,39 +466,12 @@ const handleDynamicRuleUpdate = (allModdedFiles, resolve) => {
   return true;
 };
 
-// function to escape regex
-const escapeRegex = (str) => str?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || str;
-
 /**
- * Generates a declarativeNetRequest rule to bypass cache for images
- * in the LSS Web Mod Loader.
- *
- * @return {Object} The generated rule.
+ * Removes a mod from storage and reloads the mod rules.
+ * @param {Object} mod - The mod object to remove.
+ * @return {Promise} A promise that resolves when the mod has been removed and
+ * the mod rules have been reloaded.
  */
-const generateCacheBypassRule = (pathArray) => {
-  if (!pathArray || pathArray.length === 0) return null;
-  const regexPattern = `.*(${pathArray.join("|")}).*`;
-  return {
-    id: 9999,
-    priority: 1,
-    action: {
-      type: "modifyHeaders",
-      responseHeaders: [
-        {
-          header: "Cache-Control",
-          operation: "set",
-          value: "no-store, no-cache, must-revalidate",
-        },
-        { header: "Pragma", operation: "set", value: "no-cache" },
-        { header: "Expires", operation: "set", value: "0" },
-      ],
-    },
-    condition: {
-      resourceTypes: ["xmlhttprequest", "image"],
-    },
-  };
-};
-
 const removeMod = async (mod) => {
   return new Promise((resolve) => {
     // Fetch the current mappings
@@ -464,6 +481,15 @@ const removeMod = async (mod) => {
   });
 };
 
+/**
+ * Toggles the enabled state of a mod and saves the updated state
+ * back to storage.
+ * 
+ * @param {Object} mod - The mod object containing the name of the mod
+ * to toggle.
+ * @return {Promise} A promise that resolves when the mod's enabled
+ * state has been toggled and saved.
+ */
 const toggleMod = (mod) => {
   return new Promise((resolve) => {
     extension.storage.local.get(mod.name, (result) => {
