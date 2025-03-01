@@ -275,7 +275,7 @@ const reloadModRules = () => {
 
         // end if no response
         if (!newImages.length && !filesToProcess.length) {
-          if (devmode) console.log("Cleared all rules!");
+          if (devmode) console.info("Cleared all rules!");
           return resolve();
         }
 
@@ -301,7 +301,7 @@ const resetDeclaredRules = () => {
     const ruleIds = rules.map((rule) => rule.id);
 
     // debug
-    if (devmode) console.log("Previous rules:", rules);
+    if (devmode) console.info("Previous rules:", rules);
 
     // update the rules
     await extension.declarativeNetRequest.updateDynamicRules({
@@ -452,7 +452,7 @@ const handleDynamicRuleUpdate = (allModdedFiles, resolve) => {
   }));
 
   // log if in devmode
-  if (devmode) console.log(newRules);
+  if (devmode) console.info(newRules);
 
   // Update the dynamic ruleset
   extension.declarativeNetRequest.updateDynamicRules(
@@ -476,7 +476,7 @@ const removeMod = async (mod) => {
   return new Promise((resolve) => {
     // Fetch the current mappings
     extension.storage.local.remove(mod?.name);
-    if (devmode) console.log(`Removed mod: ${mod.name}`, mod);
+    if (devmode) console.info(`Removed mod: ${mod.name}`, mod);
     reloadModRules().then(() => resolve());
   });
 };
@@ -498,7 +498,7 @@ const toggleMod = (mod) => {
       newMod.enabled = !newMod.enabled;
       // Save back to extension.storage.local
       extension.storage.local.set({ [mod.name]: newMod }, () => {
-        if (devmode) console.log(`Toggled mod: ${mod.name}`, mod);
+        if (devmode) console.info(`Toggled mod: ${mod.name}`, mod);
         resolve();
       });
     });
