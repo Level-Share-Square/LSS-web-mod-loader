@@ -11,6 +11,7 @@ const targets = [
   "load_modpack",
   "game_versions_header",
   "upload_modpack_description",
+  "loading"
 ];
 
 // load the text content from the locale to match the target

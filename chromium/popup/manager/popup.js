@@ -15,25 +15,23 @@ document.addEventListener("DOMContentLoaded", () => {
   getGameVer().then(() => displayMods());
 });
 
-// submit the form to load a new mod
-document
-  .getElementById("replacementForm")
-  .addEventListener("submit", async (event) => {
-    event.preventDefault();
-
+const handleModLoad = async () => {
+  return new Promise((resolve) => {
     const fileInput = document.getElementById("uploadModFolder");
 
     if (!fileInput.files.length) {
+      resolve();
       alert(extension.i18n.getMessage("empty_folder_error"));
-      return;
+      return
     }
 
     const loaderFile = Array.from(fileInput.files).find(
       (file) => file.name === "loader.json"
     );
     if (!loaderFile) {
+      resolve();
       alert(extension.i18n.getMessage("missing_json_error"));
-      return;
+      return
     }
 
     const reader = new FileReader();
@@ -49,8 +47,9 @@ document
             .replaceAll("<", "")
         );
       } catch (error) {
+        resolve();
         alert(extension.i18n.getMessage("invalid_json_error", [error.message]));
-        return;
+        return
       }
       // get its contents
       const {
@@ -76,10 +75,11 @@ document
             missingFields.at(-1)
             : missingFields[0];
 
+        resolve();
         alert(
           extension.i18n.getMessage("missing_fields_error", formattedFields)
         );
-        return;
+        return
       }
 
       let proceed = true;
@@ -103,6 +103,7 @@ document
 
       // if not, abort
       if (!proceed) {
+        resolve();
         return;
       }
 
@@ -122,7 +123,8 @@ document
 
         //! enforce image type
         if (type === null || !["img", "json", "any"].includes(type)) {
-          alert("Type must be img, json or any");
+          resolve()
+          alert(extension.i18n.getMessage("invalid_folder_tag_error", "img, json & any"));
           return;
         }
 
@@ -161,6 +163,7 @@ document
 
       // return if nothing was found
       if (images.length === 0 && jsons.length === 0 && other.length === 0) {
+        resolve()
         alert(extension.i18n.getMessage("imageroot_warning"));
         return;
       }
@@ -180,6 +183,7 @@ document
           ].includes(path)
         )
       ) {
+        resolve();
         alert(extension.i18n.getMessage("duplicate_key_warning"));
         return;
       }
@@ -230,21 +234,39 @@ document
         }
       }
       // Store new mod data (overwrites existing)
-      extension.storage.local.set({ [Name]: newMod }, () => {
-        // Reload mods after saving
-        extension.runtime.sendMessage(
-          { type: CONSTANTS.RELOAD_MODS },
-          (response) => {
-            // upon receiving a response, update the list
-            if (response.type === CONSTANTS.MODS_RELOADED) {
-              displayMods();
-              document.getElementById("uploadModFolder").value = "";
-              document.getElementById("submitButton").disabled = true;
+      try {
+        extension.storage.local.set({ [Name]: newMod }, () => {
+          // Reload mods after saving
+          extension.runtime.sendMessage(
+            { type: CONSTANTS.RELOAD_MODS },
+            (response) => {
+              // upon receiving a response, update the list
+              if (response.type === CONSTANTS.MODS_RELOADED) {
+                displayMods();
+                document.getElementById("uploadModFolder").value = "";
+                document.getElementById("submitButton").disabled = true;
+              }
+              resolve()
             }
-          }
-        );
-      });
+          );
+        });
+      } catch (error) {
+        resolve()
+      }
     });
 
     reader.readAsDataURL(loaderFile);
+  })
+
+}
+
+// submit the form to load a new mod
+document
+  .getElementById("replacementForm")
+  .addEventListener("submit", (event) => {
+    event.preventDefault();
+    const loadingMessage = document.getElementById("loading");
+    loadingMessage.classList.remove("hidden");
+    handleModLoad(event).finally(() =>
+      loadingMessage.classList.add("hidden"));
   });

@@ -198,78 +198,88 @@ const createToggleButton = (mod) => {
 };
 
 const reloadMods = () => {
-  try {
-    // get the active tab
-    extension.tabs.query({ active: true }, async (activeTabs) => {
-      // Wait for all window queries to resolve
-      const windows = await Promise.all(
-        activeTabs.map((tab) => extension.windows.get(tab.windowId))
-      );
-      // Filter only normal windows
-      const tabs = activeTabs.filter(
-        (_, index) => windows[index].type === "normal"
-      );
-      // send a message to be picked up by content.js
-      await extension.tabs.sendMessage(
-        tabs[0].id,
-        { type: CONSTANTS.CHECK_GAME_IFRAME },
-        (response) => {
-          if (chrome.runtime.lastError) {
-            alert(chrome.i18n.getMessage("reload_mods_error"));
-            return;
-          }
-          // reload the page entirely if there are no iframes
-          if (response === false) {
-            extension.storage.session.set({
-              surpressPopup: true,
-              hardRefreshHint: true,
-            });
+
+  // get the active tab
+  const run = () =>
+    new Promise((resolve) => extension.tabs.query({ active: true }, async (activeTabs) => {
+      try {
+        // Wait for all window queries to resolve
+        const windows = await Promise.all(
+          activeTabs.map((tab) => extension.windows.get(tab.windowId))
+        );
+        // Filter only normal windows
+        const tabs = activeTabs.filter(
+          (_, index) => windows[index].type === "normal"
+        );
+        // send a message to be picked up by content.js
+        await extension.tabs.sendMessage(
+          tabs[0].id,
+          { type: CONSTANTS.CHECK_GAME_IFRAME },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              resolve();
+              alert(chrome.i18n.getMessage("reload_mods_error"));
+              return;
+            }
+            // reload the page entirely if there are no iframes
+            if (response === false) {
+              extension.storage.session.set({
+                surpressPopup: true,
+                hardRefreshHint: true,
+              });
+              extension.runtime.sendMessage(
+                { type: CONSTANTS.RELOAD_MODS },
+                () => {
+                  resolve();
+                  if (window.devmode) return;
+                  extension.scripting.executeScript({
+                    target: { tabId: tabs[0].id },
+                    func: () => location.reload(true), // Forces a full reload, bypassing cache
+                  });
+                  window.close();
+                }
+              );
+              return;
+            }
+            // otherwise reload the mod rules
             extension.runtime.sendMessage(
               { type: CONSTANTS.RELOAD_MODS },
-              () => {
-                if (window.devmode) return;
-                extension.scripting.executeScript({
-                  target: { tabId: tabs[0].id },
-                  func: () => location.reload(true), // Forces a full reload, bypassing cache
+              (response) => {
+                if (response.type === CONSTANTS.MODS_RELOADED) {
+                  // update display
+                  displayMods();
+                  resolve();
+                  const reloadModsElement =
+                    document.getElementsByClassName("reload_mods");
+                  // update message/tooltip
+                  reloadModsElement[0].innerHTML = extension.i18n.getMessage(
+                    "reload_mods_reminder"
+                  );
+                  reloadModsElement[0].title = extension.i18n.getMessage(
+                    "reload_mods_tooltip"
+                  );
+                  // remove red color if applicable
+                  if (reloadModsElement[0].classList.contains("danger"))
+                    reloadModsElement[0].classList.remove("danger");
+                }
+                // reload the game on the current tab
+                extension.tabs.sendMessage(tabs[0].id, {
+                  type: CONSTANTS.RELOAD_GAME,
                 });
-                window.close();
               }
             );
-            return;
           }
-          // otherwise reload the mod rules
-          extension.runtime.sendMessage(
-            { type: CONSTANTS.RELOAD_MODS },
-            (response) => {
-              if (response.type === CONSTANTS.MODS_RELOADED) {
-                // update display
-                displayMods();
-                const reloadModsElement =
-                  document.getElementsByClassName("reload_mods");
-                // update message/tooltip
-                reloadModsElement[0].innerHTML = extension.i18n.getMessage(
-                  "reload_mods_reminder"
-                );
-                reloadModsElement[0].title = extension.i18n.getMessage(
-                  "reload_mods_tooltip"
-                );
-                // remove red color if applicable
-                if (reloadModsElement[0].classList.contains("danger"))
-                  reloadModsElement[0].classList.remove("danger");
-              }
-              // reload the game on the current tab
-              extension.tabs.sendMessage(tabs[0].id, {
-                type: CONSTANTS.RELOAD_GAME,
-              });
-            }
-          );
-        }
-      );
-    });
-  } catch (err) {
-    alert(chrome.i18n.getMessage("reload_mods_error"));
-    console.error(err);
-  }
+        );
+      } catch (err) {
+        alert(chrome.i18n.getMessage("reload_mods_error"));
+        resolve();
+        console.error(err);
+      }
+    }));
+
+  const loadingMessage = document.getElementById("loading");
+  loadingMessage.classList.remove("hidden");
+  run().finally(() => loadingMessage.classList.add("hidden"));
 };
 
 if (reloadModsButton) reloadModsButton.addEventListener("click", reloadMods);

@@ -110,5 +110,17 @@
   },
   "duplicate_key_warning": {
     "message": "Je loader.json bestand mag geen sleutels in de rootfolder bevatten die dezelfde naam hebben als normale sleutels."
+  },
+  "invalid_folder_tag_error": {
+    "message": "Het 'rootfolder' veld in de loader.json bestand heeft geen correcte tag voor alle sleutels, zorg ervoor dat je een van de volgende tags gebruikt: $tags$",
+    "placeholders": {
+      "tags": {
+        "content": "$1",
+        "example": "img, json & any"
+      }
+    }
+  },
+  "loading": {
+    "message": "Bezig met laden..."
   }
 }

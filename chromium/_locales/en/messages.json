@@ -140,5 +140,19 @@
   "duplicate_key_warning": {
     "message": "Your loader.json file can't contain rootfolder keys that are exactly the same as regular keys!",
     "description": "The message to warn the user if the loader.json file contains duplicate keys with its rootfolder"
+  },
+  "invalid_folder_tag_error": {
+    "message": "The rootfolder field of the loader.json file doesn't have a valid folder tag for every folder, valid tags: $tags$",
+    "description": "The message to warn the user if the loader.json file contains an invalid folder tag",
+    "placeholders": {
+      "tags": {
+        "content": "$1",
+        "example": "img, json & any"
+      }
+    }
+  },
+  "loading": {
+    "message": "Loading...",
+    "description": "The message to display when mods are loading"
   }
 }
