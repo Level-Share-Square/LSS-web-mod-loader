@@ -110,5 +110,50 @@
   },
   "duplicate_key_warning": {
     "message": "¡Tu archivo loader.json no puede contener llaves de carpeta raíz que sean exactamente iguales a las llaves normales!"
+  },
+  "invalid_folder_tag_error": {
+    "message": "El campo de la carpeta raíz del archivo loader.json no tiene una etiqueta de carpeta válida para cada carpeta, etiquetas válidas: $tags$",
+    "placeholders": {
+      "tags": {
+        "content": "$1",
+        "example": "img, json & any"
+      }
+    }
+  },
+  "loading": {
+    "message": "Cargando...",
+  },
+  "find_mods": {
+    "message": "Buscar mods",
+  },
+  "mod_browser_title": {
+    "message": "Base de datos de mods",
+  },
+  "connection_error": {
+    "message": "No se pudo conectar a los servidores de LSS, ¿Estarán inactivos por mantenimiento?",
+  },
+  "no_mods_for_query": {
+    "message": "Tu busqueda no encontró mods",
+  },
+  "install_mod": {
+    "message": "Instalar mod",
+  },
+  "install_mod_confirm": {
+    "message": "¿Añadir este mod al gestor de mods?",
+  },
+  "update_mod": {
+    "message": "Actualizar mod",
+  },
+  "update_mod_confirm": {
+    "message": "Esto actualizará el mod a la ultima versión de LSS. ¿Continuar?",
+  },
+  "browser_load_success": {
+    "message": "Mod instalado con éxito, ¡Asegúrate de recargar tus mods la próxima vez que abras el juego!",
+  },
+  "mod_up_to_date": {
+    "message": "[Actualizado]",
+  },
+  "mod_update_available": {
+    "message": "[Actualización disponible]",
   }
 }
