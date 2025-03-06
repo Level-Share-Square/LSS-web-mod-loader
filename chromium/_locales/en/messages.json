@@ -184,7 +184,7 @@
     "description": "The name of the button to update a mod already installed"
   },
   "update_mod_confirm": {
-    "message": "This will udpdate the mod to the latest version on LSS. Continue?",
+    "message": "This will update the mod to the latest version on LSS. Continue?",
     "description": "Update mod confirmation message"
   },
   "browser_load_success": {
@@ -202,5 +202,13 @@
   "search_input_placeholder": {
     "message": "Search mods...",
     "description": "The placeholder for the search input"
+  },
+  "search_button_tooltip": {
+    "message": "Click here to execute your query",
+    "description": "The tooltip for the search button"
+  },
+  "reset_button_tooltip": {
+    "message": "Click to reset the mod list",
+    "description": "The tooltip for the reset button"
   }
 }

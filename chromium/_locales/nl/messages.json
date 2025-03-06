@@ -158,5 +158,11 @@
   },
   "search_input_placeholder": {
     "message": "Zoek voor mods..."
+  },
+  "search_button_tooltip": {
+    "message": "Klik hier om je zoekopdracht uit te voeren"
+  },
+  "reset_button_tooltip": {
+    "message": "Klik hier om de mod lijst te resetten"
   }
 }
