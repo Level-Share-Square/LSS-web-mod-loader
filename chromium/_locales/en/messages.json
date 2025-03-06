@@ -198,5 +198,9 @@
   "mod_update_available": {
     "message": "[Update available]",
     "description": "The message to display when a mod has an update available"
+  },
+  "search_input_placeholder": {
+    "message": "Search mods...",
+    "description": "The placeholder for the search input"
   }
 }

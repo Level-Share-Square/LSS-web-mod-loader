@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="page.css" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=delete,download,sync"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=delete,download,search,sync"
     />
   </head>
   <script src="./page.js"></script>
@@ -19,6 +19,17 @@
     <div id="page">
       <div class="title-bar">
         <h1 id="header-browser">Level Share Square - Mod browser</h1>
+        <div id="search-bar">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search mods..."
+            disabled
+          />
+          <button type="button" id="search-button" class="btn" disabled>
+            <span class="material-symbols-outlined"> search </span>
+          </button>
+        </div>
       </div>
       <i id="empty" class="hidden">Couldn't find any mods for your query</i>
       <span class="loading" id="loading">Loading...</span>

@@ -12,7 +12,7 @@ const targets = [
   "game_versions_header",
   "upload_modpack_description",
   "loading",
-  "find_mods"
+  "find_mods",
 ];
 
 // load the text content from the locale to match the target

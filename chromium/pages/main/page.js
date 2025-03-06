@@ -24,6 +24,8 @@ const handleEmptyResponse = (connectionError) => {
 window.addEventListener("DOMContentLoaded", () => {
     // load the game version
     getGameVer();
+    document.getElementById("search-input").placeholder =
+        extension.i18n.getMessage("search_input_placeholder");
     const noMods = document.getElementById("empty");
     if (!noMods.classList.contains("hidden")) noMods.classList.add("hidden");
     // change the title
@@ -34,6 +36,14 @@ window.addEventListener("DOMContentLoaded", () => {
     // fetch list
     handleModListFetch();
 });
+
+
+const updateSearchButton = (enabled) => {
+    const searchButton = document.getElementById("search-button");
+    const inputField = document.getElementById("search-input");
+    searchButton.disabled = !enabled;
+    inputField.disabled = !enabled;
+}
 
 /**
  * Handles the mod list fetch request.
@@ -48,7 +58,8 @@ const handleModListFetch = () => {
     // get query parameters
     const urlParams = new URLSearchParams(window.location.search);
     const page = parseInt(urlParams.get("page")) || 1;
-    const query = `?page=${page}&search=`;
+    const search = urlParams.get("search") || "";
+    const query = `?page=${page}&search=${search}`;
 
     // api call
     fetch(apiBaseUrl + "get" + query)
@@ -60,6 +71,7 @@ const handleModListFetch = () => {
             if (mods.length === 0) return handleEmptyResponse(false);
             displayMods(mods);
             updatePagination(pages, page);
+            updateSearchButton(true);
         })// fallback
         .catch(() => handleEmptyResponse(true));
 };

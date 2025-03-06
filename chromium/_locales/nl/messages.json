@@ -155,5 +155,8 @@
   },
   "mod_update_available": {
     "message": "[Nieuwe versie beschikbaar]"
+  },
+  "search_input_placeholder": {
+    "message": "Zoek voor mods..."
   }
 }
