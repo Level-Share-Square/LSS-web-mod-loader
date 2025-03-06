@@ -110,5 +110,59 @@
   },
   "duplicate_key_warning": {
     "message": "loader.jsonファイルには、通常のキーとまったく同じルートディレクトリーのキーを含めることはできません！"
+  },
+  "invalid_folder_tag_error": {
+    "message": "loader.jsonファイルのルートフォルダーフィールドに、すべてのフォルダーに有効なフォルダータグがありません。有効なタグの例：$tags$",
+    "placeholders": {
+      "tags": {
+        "content": "$1",
+        "example": "img, json & any"
+      }
+    }
+  },
+  "loading": {
+    "message": "ロード中",
+  },
+  "find_mods": {
+    "message": "MODを見る",
+  },
+  "mod_browser_title": {
+    "message": "MODデータベース",
+  },
+  "connection_error": {
+    "message": "LSSサーバーへの接続に失敗しました。メンテナンスのためにダウンしているのでしょうか？",
+  },
+  "no_mods_for_query": {
+    "message": "検索は、MODが見つかりませんでした。",
+  },
+  "install_mod": {
+    "message": "MODをインストールする",
+  },
+  "install_mod_confirm": {
+    "message": "MODをMODマネージャーに追加しますか？",
+  },
+  "update_mod": {
+    "message": "MODを更新",
+  },
+  "update_mod_confirm": {
+    "message": "これでLSSのMODが最新版に更新されます。続ける？",
+  },
+  "browser_load_success": {
+    "message": "MODのインストールに成功しました。次回ゲームを開くときは、MODをリロードしてください！",
+  },
+  "mod_up_to_date": {
+    "message": "[更新済み]",
+  },
+  "mod_update_available": {
+    "message": "[更新あり]",
+  },
+  "search_input_placeholder": {
+    "message": "MOD検索",
+  },
+  "search_button_tooltip": {
+    "message": "検索はこちらから",
+  },
+  "reset_button_tooltip": {
+    "message": "クリックしてMODリストをリセットする",
   }
 }
