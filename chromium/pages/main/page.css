@@ -33,6 +33,11 @@ body::after {
   padding: 20px;
   background-color: rgba(35, 0, 132, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.24);
+  transition: background-color 0.8s ease;
+}
+
+.title-bar:hover {
+  background-color: rgba(212, 56, 255, 0.18);
 }
 
 h1 {
@@ -53,7 +58,7 @@ h1 {
 }
 
 .up-to-date {
-  color: rgb(94, 255, 94);
+  color: rgb(255, 112, 243);
 }
 
 .update-availability {

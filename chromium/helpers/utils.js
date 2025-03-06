@@ -45,7 +45,6 @@ extension.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
  */
 
 const displayMods = (modInput) => {
-
   const runDisplay = (mods, storedMods) => {
     // parse the mods
     const parsedStoredMods =
@@ -63,18 +62,20 @@ const displayMods = (modInput) => {
     document.getElementById("empty").style.display = hasMods ? "none" : "block";
     // loop over mods to turn them into elements
     mods.forEach((mod) => {
-
       // check if the user already owns the mod
-      const isOwned = parsedStoredMods.find(
-        (storedMod) => storedMod?.name === mod?.name
-      );
-      const hasLatestVersion = parsedStoredMods.find(
-        (storedMod) => storedMod?.version === mod?.version
-      );
+      const isOwned =
+        parsedStoredMods.find((storedMod) => storedMod?.name === mod?.name) &&
+        window.modBrowser;
+      const hasLatestVersion =
+        parsedStoredMods.find(
+          (storedMod) => storedMod?.version === mod?.version
+        ) && window.modBrowser;
 
       // create a list item
       const listItem = document.createElement("span");
       listItem.classList.add("list-item");
+
+      if (isOwned) listItem.classList.add("owned");
 
       // create an element for the text
       const itemText = document.createElement("span");
@@ -137,13 +138,17 @@ const displayMods = (modInput) => {
     // update page state for mod browser
     if (window.modBrowser === true) {
       // get elements
-      const modBrowserContainer = document.getElementById("mod-browser-container");
+      const modBrowserContainer = document.getElementById(
+        "mod-browser-container"
+      );
       const loadingEl = document.getElementById("loading");
       // make them visible
-      if (modBrowserContainer.classList.contains("hidden")) modBrowserContainer.classList.remove("hidden");
-      if (!loadingEl.classList.contains("hidden")) loadingEl.classList.add("hidden");
+      if (modBrowserContainer.classList.contains("hidden"))
+        modBrowserContainer.classList.remove("hidden");
+      if (!loadingEl.classList.contains("hidden"))
+        loadingEl.classList.add("hidden");
     }
-  }
+  };
   // if invoked by the installed mod list
   extension.storage.local.get(null, (result) => runDisplay(modInput, result));
 };
@@ -159,7 +164,7 @@ const createRemoveButton = (mod, listItem) => {
   const removeButton = document.createElement("button");
   removeButton.classList.add("action-button");
   removeButton.title = extension.i18n.getMessage("remove_mod");
-  removeButton.style.setProperty('--button-color', "223, 38, 13");
+  removeButton.style.setProperty("--button-color", "223, 38, 13");
   removeButton.classList.add("material-symbols-outlined");
   removeButton.classList.add("delete-button");
   removeButton.textContent = "delete";
@@ -175,7 +180,6 @@ const createRemoveButton = (mod, listItem) => {
       { type: CONSTANTS.REMOVE_MOD, mod: mod },
       (response) => {
         if (response.type === CONSTANTS.MOD_REMOVED) {
-
           // change the buttons for mod browser
           if (window.modBrowser) {
             // remove the delete button
@@ -185,7 +189,8 @@ const createRemoveButton = (mod, listItem) => {
             listItem.appendChild(downloadButton);
             // remove latest version indicator
             listItem.querySelector(".up-to-date-display").remove();
-            return
+            listItem.classList.toggle("owned");
+            return;
           }
 
           // remove the mod entry
@@ -204,38 +209,49 @@ const createRemoveButton = (mod, listItem) => {
 const createDownloadButton = (mod, listItem, listAsUpdate) => {
   // Add a remove button
   const downloadButton = document.createElement("button");
-  downloadButton.style.setProperty('--button-color', listAsUpdate ? "0, 163, 251" : "47, 175, 0");
+  downloadButton.style.setProperty(
+    "--button-color",
+    listAsUpdate ? "0, 163, 251" : "47, 175, 0"
+  );
   downloadButton.classList.add("action-button");
-  downloadButton.title = extension.i18n.getMessage(listAsUpdate ? "update_mod" : "install_mod");
+  downloadButton.title = extension.i18n.getMessage(
+    listAsUpdate ? "update_mod" : "install_mod"
+  );
   downloadButton.classList.add("material-symbols-outlined");
   downloadButton.textContent = listAsUpdate ? "sync" : "download";
-  if (listAsUpdate) downloadButton.classList.add("rainbow-action")
+  if (listAsUpdate) downloadButton.classList.add("rainbow-action");
   // onclick event handler
   downloadButton.addEventListener("click", async () => {
     // confirmation
     const proceed = await confirm(
-      extension.i18n.getMessage(listAsUpdate ? "update_mod_confirm" : "install_mod_confirm")
+      extension.i18n.getMessage(
+        listAsUpdate ? "update_mod_confirm" : "install_mod_confirm"
+      )
     );
     if (!proceed) return;
 
     // make a call to the background to fetch the mod
     const folder = await handleModFetch(mod);
-    await handleModLoad(folder);
+    const success = await handleModLoad(folder);
+    if (!success) return;
     // update latest version indicator
     const updateAvailability = listItem.querySelector(".up-to-date-display");
     if (updateAvailability) {
       // update sync button
-      updateAvailability.classList.remove("update-availability")
-      updateAvailability.classList.add("up-to-date")
-      updateAvailability.innerHTML = " " + extension.i18n.getMessage("mod_up_to_date");
+      updateAvailability.classList.remove("update-availability");
+      updateAvailability.classList.add("up-to-date");
+      updateAvailability.innerHTML =
+        " " + extension.i18n.getMessage("mod_up_to_date");
     } else {
       // reapply download button
       const newUpdAv = createUpdateAvailability(true);
+      //up date list item
       listItem.querySelector(".list-item-text").appendChild(newUpdAv);
+      listItem.classList.toggle("owned");
     }
     // update display
     downloadButton.remove();
-    const oldRemoveButton = listItem.querySelector('.delete-button');
+    const oldRemoveButton = listItem.querySelector(".delete-button");
     if (oldRemoveButton) return;
     // add a remove button
     const removeButton = createRemoveButton(mod, listItem);
@@ -247,23 +263,29 @@ const createDownloadButton = (mod, listItem, listAsUpdate) => {
 
 /**
  * Creates a span element indicating the update availability of a mod.
- * 
+ *
  * @param {boolean} hasLatestVersion - A boolean indicating if the mod is up to date.
  * If true, the element will display an "up-to-date" message; otherwise, it will indicate
  * that an update is available.
- * 
+ *
  * @returns {HTMLElement} A span element with appropriate classes and message
  * reflecting the mod's update status.
  */
 
 const createUpdateAvailability = (hasLatestVersion) => {
   const updateAvailability = document.createElement("span");
-  updateAvailability.classList.add(hasLatestVersion ? "up-to-date" : "update-availability");
+  updateAvailability.classList.add(
+    hasLatestVersion ? "up-to-date" : "update-availability"
+  );
   updateAvailability.classList.add("list-item-text");
   updateAvailability.classList.add("up-to-date-display");
-  updateAvailability.innerHTML = " " + extension.i18n.getMessage(hasLatestVersion ? "mod_up_to_date" : "mod_update_available");
-  return updateAvailability
-}
+  updateAvailability.innerHTML =
+    " " +
+    extension.i18n.getMessage(
+      hasLatestVersion ? "mod_up_to_date" : "mod_update_available"
+    );
+  return updateAvailability;
+};
 
 /**
  * Creates a toggle button to toggle a mod on or off
@@ -339,84 +361,85 @@ const createToggleButton = (mod) => {
  * @returns {Promise<void>}
  */
 const reloadMods = () => {
-
   // get the active tab
   const run = () =>
-    new Promise((resolve) => extension.tabs.query({ active: true }, async (activeTabs) => {
-      try {
-        // Wait for all window queries to resolve
-        const windows = await Promise.all(
-          activeTabs.map((tab) => extension.windows.get(tab.windowId))
-        );
-        // Filter only normal windows
-        const tabs = activeTabs.filter(
-          (_, index) => windows[index].type === "normal"
-        );
-        // send a message to be picked up by content.js
-        await extension.tabs.sendMessage(
-          tabs[0].id,
-          { type: CONSTANTS.CHECK_GAME_IFRAME },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              resolve();
-              alert(chrome.i18n.getMessage("reload_mods_error"));
-              return;
-            }
-            // reload the page entirely if there are no iframes
-            if (response === false) {
-              extension.storage.session.set({
-                surpressPopup: true,
-                hardRefreshHint: true,
-              });
+    new Promise((resolve) =>
+      extension.tabs.query({ active: true }, async (activeTabs) => {
+        try {
+          // Wait for all window queries to resolve
+          const windows = await Promise.all(
+            activeTabs.map((tab) => extension.windows.get(tab.windowId))
+          );
+          // Filter only normal windows
+          const tabs = activeTabs.filter(
+            (_, index) => windows[index].type === "normal"
+          );
+          // send a message to be picked up by content.js
+          await extension.tabs.sendMessage(
+            tabs[0].id,
+            { type: CONSTANTS.CHECK_GAME_IFRAME },
+            (response) => {
+              if (chrome.runtime.lastError) {
+                resolve();
+                alert(chrome.i18n.getMessage("reload_mods_error"));
+                return;
+              }
+              // reload the page entirely if there are no iframes
+              if (response === false) {
+                extension.storage.session.set({
+                  surpressPopup: true,
+                  hardRefreshHint: true,
+                });
+                extension.runtime.sendMessage(
+                  { type: CONSTANTS.RELOAD_MODS },
+                  () => {
+                    resolve();
+                    if (window.devmode) return;
+                    extension.scripting.executeScript({
+                      target: { tabId: tabs[0].id },
+                      func: () => location.reload(true), // Forces a full reload, bypassing cache
+                    });
+                    window.close();
+                  }
+                );
+                return;
+              }
+              // otherwise reload the mod rules
               extension.runtime.sendMessage(
                 { type: CONSTANTS.RELOAD_MODS },
-                () => {
-                  resolve();
-                  if (window.devmode) return;
-                  extension.scripting.executeScript({
-                    target: { tabId: tabs[0].id },
-                    func: () => location.reload(true), // Forces a full reload, bypassing cache
+                (response) => {
+                  if (response.type === CONSTANTS.MODS_RELOADED) {
+                    // update display
+                    displayMods();
+                    resolve();
+                    const reloadModsElement =
+                      document.getElementsByClassName("reload_mods");
+                    // update message/tooltip
+                    reloadModsElement[0].innerHTML = extension.i18n.getMessage(
+                      "reload_mods_reminder"
+                    );
+                    reloadModsElement[0].title = extension.i18n.getMessage(
+                      "reload_mods_tooltip"
+                    );
+                    // remove red color if applicable
+                    if (reloadModsElement[0].classList.contains("danger"))
+                      reloadModsElement[0].classList.remove("danger");
+                  }
+                  // reload the game on the current tab
+                  extension.tabs.sendMessage(tabs[0].id, {
+                    type: CONSTANTS.RELOAD_GAME,
                   });
-                  window.close();
                 }
               );
-              return;
             }
-            // otherwise reload the mod rules
-            extension.runtime.sendMessage(
-              { type: CONSTANTS.RELOAD_MODS },
-              (response) => {
-                if (response.type === CONSTANTS.MODS_RELOADED) {
-                  // update display
-                  displayMods();
-                  resolve();
-                  const reloadModsElement =
-                    document.getElementsByClassName("reload_mods");
-                  // update message/tooltip
-                  reloadModsElement[0].innerHTML = extension.i18n.getMessage(
-                    "reload_mods_reminder"
-                  );
-                  reloadModsElement[0].title = extension.i18n.getMessage(
-                    "reload_mods_tooltip"
-                  );
-                  // remove red color if applicable
-                  if (reloadModsElement[0].classList.contains("danger"))
-                    reloadModsElement[0].classList.remove("danger");
-                }
-                // reload the game on the current tab
-                extension.tabs.sendMessage(tabs[0].id, {
-                  type: CONSTANTS.RELOAD_GAME,
-                });
-              }
-            );
-          }
-        );
-      } catch (err) {
-        alert(chrome.i18n.getMessage("reload_mods_error"));
-        resolve();
-        console.error(err);
-      }
-    }));
+          );
+        } catch (err) {
+          alert(chrome.i18n.getMessage("reload_mods_error"));
+          resolve();
+          console.error(err);
+        }
+      })
+    );
 
   const loadingMessage = document.getElementById("loading");
   loadingMessage.classList.remove("hidden");
@@ -431,7 +454,7 @@ const reloadMods = () => {
 const findMods = () => {
   extension.tabs.create({
     url: chrome.runtime.getURL("pages/main/page.html"),
-    active: true
+    active: true,
   });
 };
 
@@ -585,9 +608,8 @@ const loadAndModifyImage = (original, modified) => {
   });
 };
 
-
 /**
- * Handles loading a mod by taking a folder input from the user, 
+ * Handles loading a mod by taking a folder input from the user,
  * finding the loader.json file, parsing it, and storing the data in local storage.
  * @returns {Promise<void>}
  */
@@ -595,15 +617,14 @@ const handleModLoad = async (input) => {
   return new Promise((resolve, reject) => {
     try {
       let fileInput = input;
-      if (input.target)
-        fileInput = document.getElementById("uploadModFolder");
+      if (input.target) fileInput = document.getElementById("uploadModFolder");
 
       console.log(fileInput, fileInput.files);
 
       if (!fileInput.files.length) {
         resolve();
         alert(extension.i18n.getMessage("empty_folder_error"));
-        return
+        return;
       }
 
       const loaderFile = Array.from(fileInput.files).find(
@@ -612,7 +633,7 @@ const handleModLoad = async (input) => {
       if (!loaderFile) {
         resolve();
         alert(extension.i18n.getMessage("missing_json_error"));
-        return
+        return;
       }
 
       const reader = new FileReader();
@@ -629,8 +650,10 @@ const handleModLoad = async (input) => {
           );
         } catch (error) {
           resolve();
-          alert(extension.i18n.getMessage("invalid_json_error", [error.message]));
-          return
+          alert(
+            extension.i18n.getMessage("invalid_json_error", [error.message])
+          );
+          return;
         }
         // get its contents
         const {
@@ -660,7 +683,7 @@ const handleModLoad = async (input) => {
           alert(
             extension.i18n.getMessage("missing_fields_error", formattedFields)
           );
-          return
+          return;
         }
 
         let proceed = true;
@@ -704,8 +727,13 @@ const handleModLoad = async (input) => {
 
           //! enforce image type
           if (type === null || !["img", "json", "any"].includes(type)) {
-            resolve()
-            alert(extension.i18n.getMessage("invalid_folder_tag_error", "img, json & any"));
+            resolve();
+            alert(
+              extension.i18n.getMessage(
+                "invalid_folder_tag_error",
+                "img, json & any"
+              )
+            );
             return;
           }
 
@@ -735,23 +763,23 @@ const handleModLoad = async (input) => {
           if (type === "any")
             other = Array.from(fileInput.files)
               .map((file) => ({ file, key })) // convert to array of objects
-              .filter(
-                ({ file }) =>
-                  // filter out non-images
-                  file.webkitRelativePath.startsWith(normalizedImageRoot)
+              .filter(({ file }) =>
+                // filter out non-images
+                file.webkitRelativePath.startsWith(normalizedImageRoot)
               );
         }
 
         // return if nothing was found
         if (images.length === 0 && jsons.length === 0 && other.length === 0) {
-          resolve()
+          resolve();
           alert(extension.i18n.getMessage("imageroot_warning"));
           return;
         }
 
         const rootFolderPaths = // path becomes key for empty object
-          Object.keys(RootFolder).map((key) => ({ [RootFolder[key][0]]: {} })) ||
-          [];
+          Object.keys(RootFolder).map((key) => ({
+            [RootFolder[key][0]]: {},
+          })) || [];
         if (
           // disallow duplicate keys
           rootFolderPaths.some((path) =>
@@ -785,7 +813,10 @@ const handleModLoad = async (input) => {
           for (const fileObj of allFiles) {
             // may sure key belongs to the file
             if (fileObj.key !== key) continue;
-            const normalizedImageRoot = `${folderName}/${key}`.replace(/\/$/, "");
+            const normalizedImageRoot = `${folderName}/${key}`.replace(
+              /\/$/,
+              ""
+            );
             // set file path
             const file = fileObj.file;
             const fileReader = new FileReader();
@@ -805,7 +836,10 @@ const handleModLoad = async (input) => {
             const folderTarget = RootFolder[key][0];
             const fileType = RootFolder[key][1];
             const dataType = fileType === "img" ? "image" : "application";
-            const mimeType = fileType === "any" ? fileObj.file.type : `${dataType}/${file.type.split("/")[1]}`;
+            const mimeType =
+              fileType === "any"
+                ? fileObj.file.type
+                : `${dataType}/${file.type.split("/")[1]}`;
             // Overwrite files completely
             newMod[folderTarget][filePath] = [
               `data:${mimeType};base64,${base64}`,
@@ -819,7 +853,7 @@ const handleModLoad = async (input) => {
           // stop early
           if (window.modBrowser) {
             alert(extension.i18n.getMessage("browser_load_success"));
-            return resolve();
+            return resolve(true);
           }
           // Reload mods after saving
           extension.runtime.sendMessage(
@@ -835,16 +869,15 @@ const handleModLoad = async (input) => {
               if (response.type === CONSTANTS.ERROR) {
                 alert(response.message);
               }
-              resolve()
+              resolve();
             }
           );
         });
-
       });
 
       reader.readAsDataURL(loaderFile);
     } catch (error) {
-      return reject()
+      return reject();
     }
-  })
-}
+  });
+};
