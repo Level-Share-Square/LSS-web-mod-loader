@@ -154,5 +154,49 @@
   "loading": {
     "message": "Loading...",
     "description": "The message to display when mods are loading"
+  },
+  "find_mods": {
+    "message": "Browse mods",
+    "description": "The name of the button to open a page to browse through LSS mods"
+  },
+  "mod_browser_title": {
+    "message": "Mod database",
+    "description": "The title of the mod browser page"
+  },
+  "connection_error": {
+    "message": "Failed to connect to the LSS servers, are they down for maintenance?",
+    "description": "The message to display when the extension couldn't connect to the LSS api"
+  },
+  "no_mods_for_query": {
+    "message": "No mods were found for your query",
+    "description": "The message to display when no mods were found for a query"
+  },
+  "install_mod": {
+    "message": "Install mod",
+    "description": "The name of the button to install a mod from the browser"
+  },
+  "install_mod_confirm": {
+    "message": "Add this mod to the mod loader?",
+    "description": "The message to display when the user is about to install a mod"
+  },
+  "update_mod": {
+    "message": "Update mod",
+    "description": "The name of the button to update a mod already installed"
+  },
+  "update_mod_confirm": {
+    "message": "This will udpdate the mod to the latest version on LSS. Continue?",
+    "description": "Update mod confirmation message"
+  },
+  "browser_load_success": {
+    "message": "Successfully installed mod, make sure to reload your mods next time you open the game!",
+    "description": "The message to display when a mod was successfully installed from the mod database"
+  },
+  "mod_up_to_date": {
+    "message": "[Up to date]",
+    "description": "The message to display when a mod is up to date"
+  },
+  "mod_update_available": {
+    "message": "[Update available]",
+    "description": "The message to display when a mod has an update available"
   }
 }

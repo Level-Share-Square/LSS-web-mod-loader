@@ -13,6 +13,7 @@ const CONSTANTS = {
   RELOAD_GAME: "RELOAD_GAME",
   RELOAD_MODS: "RELOAD_MODS",
   PROCESS_IMAGES: "PROCESS_IMAGES",
+  ERROR: "ERROR",
 };
 
 extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -89,7 +90,7 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       // then send the response
       sendResponse({ type: CONSTANTS.MODS_RELOADED });
-    });
+    }).catch((error) => sendResponse({ type: CONSTANTS.ERROR, message: error.message }));
     return true; // async response
   }
 });

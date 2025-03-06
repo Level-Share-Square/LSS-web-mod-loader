@@ -157,8 +157,8 @@ body::after {
 }
 
 .action-button:hover {
-  color: rgb(223, 38, 13);
-  border-color: rgb(223, 38, 13);
+  color: rgb(var(--button-color));
+  border-color: rgb(var(--button-color));
   background-color: rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
@@ -321,9 +321,16 @@ button.danger:before {
 
 .flex {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
-  flex-direction: row;
+  max-width: 100%;
   gap: 6px;
+}
+
+.row-wrap {
+  max-width: 80%;
+  flex-basis: calc(50% - 6px);
 }
 
 .line {

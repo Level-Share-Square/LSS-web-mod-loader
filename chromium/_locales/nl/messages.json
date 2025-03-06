@@ -122,5 +122,38 @@
   },
   "loading": {
     "message": "Bezig met laden..."
+  },
+  "find_mods": {
+    "message": "Zoek mods"
+  },
+  "mod_browser_title": {
+    "message": "Mod databank"
+  },
+  "connection_error": {
+    "message": "We konden geen verbinding maken met LSS, probeer het later opnieuw."
+  },
+  "no_mods_for_query": {
+    "message": "Er waren geen mods die overeen kwamen met je zoekopdracht"
+  },
+  "install_mod": {
+    "message": "Installeer mod"
+  },
+  "install_mod_confirm": {
+    "message": "Weet je zeker dat je deze mod wil toevoegen aan de WML extensie?"
+  },
+  "update_mod": {
+    "message": "Installeer de nieuwste versie"
+  },
+  "update_mod_confirm": {
+    "message": "Weet je zeker dat je de nieuwste versie van deze mod wil installeren?"
+  },
+  "browser_load_success": {
+    "message": "De mod is met succes geinstalleerd, zorg ervoor dat je de mods herlaad om de wijzigingen te zien."
+  },
+  "mod_up_to_date": {
+    "message": "[Bijgewerkt]"
+  },
+  "mod_update_available": {
+    "message": "[Nieuwe versie beschikbaar]"
   }
 }

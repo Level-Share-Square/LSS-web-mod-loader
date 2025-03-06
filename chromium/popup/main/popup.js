@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // map the mods
+  // map the mods if not in mod manager
+  if (window.modBrowser) return;
   getGameVer().then(() => displayMods());
 });
