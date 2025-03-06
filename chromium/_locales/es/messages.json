@@ -155,5 +155,14 @@
   },
   "mod_update_available": {
     "message": "[Actualización disponible]"
+  },
+  "search_input_placeholder": {
+    "message": "Buscar mods...",
+  },
+  "search_button_tooltip": {
+    "message": "Haz clic aquí para hacer tu búsqueda",
+  },
+  "reset_button_tooltip": {
+    "message": "Clic para restablecer la lista de mods",
   }
 }
