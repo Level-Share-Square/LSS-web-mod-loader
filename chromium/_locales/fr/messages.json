@@ -110,5 +110,50 @@
   },
   "duplicate_key_warning": {
     "message": "Ton fichier loader.json ne peut pas contenir des clés de dossier racine qui sont exactement les mêmes que des clés normales !"
+  },
+  "invalid_folder_tag_error": {
+    "message": "Le champ du dossier racine du fichier loader.json n'a pas d'étiquette de dossier valide pour chaque dossier, étiquettes valides : $tags$",
+    "placeholders": {
+      "tags": {
+        "content": "$1",
+        "example": "img, json & any"
+      }
+    }
+  },
+  "loading": {
+    "message": "Chargement...",
+  },
+  "find_mods": {
+    "message": "Chercher des mods",
+  },
+  "mod_browser_title": {
+    "message": "Base de données de mods",
+  },
+  "connection_error": {
+    "message": "Impossible de se connecter aux serveurs LSS, sont-ils indisponibles pour cause de maintenance ?",
+  },
+  "no_mods_for_query": {
+    "message": "Ta recherche n'a pas trouvé de mods",
+  },
+  "install_mod": {
+    "message": "Installer le mod",
+  },
+  "install_mod_confirm": {
+    "message": "Ajouter ce mod au chargeur de mods ?",
+  },
+  "update_mod": {
+    "message": "Mettre à jour le mod",
+  },
+  "update_mod_confirm": {
+    "message": "Ceci mettra à jour le mod vers la dernière version de LSS. Continuer ?",
+  },
+  "browser_load_success": {
+    "message": "Le mod a été installé avec succès, assure-toi de recharger tes mods la prochaine fois que tu ouvriras le jeu !",
+  },
+  "mod_up_to_date": {
+    "message": "[Mise à jour]",
+  },
+  "mod_update_available": {
+    "message": "[Mise à jour disponible]",
   }
 }
