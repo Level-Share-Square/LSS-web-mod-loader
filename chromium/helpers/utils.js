@@ -40,6 +40,40 @@ extension.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
 });
 
 /**
+ * Checks if a mod has the latest version based on the version stored in localStorage.
+ * Compares the versions of the mod and the stored mod, and returns true if the mod
+ * has a newer version, or false if the mod has an older version.
+ * @param {Object} mod - The mod to be checked.
+ * @param {Array} storedMods - The array of mods stored in localStorage.
+ * @return {Boolean} - True if the mod has the latest version, false otherwise.
+ */
+const checkLatestVersion = (mod, storedMods) => {
+  // define the values
+  const version = mod.version;
+  const savedVersion = storedMods.find((storedMod) => storedMod?.name === mod?.name)?.version;
+  // transform version into array
+  const verArr = version.split(".");
+  const savVerArr = savedVersion.split(".");
+  const length = Math.max(verArr.length, savVerArr.length);
+  // loop over the versions
+  for (let i = 0; i < length; i++) {
+    // get the value
+    const val1 = parseInt(verArr?.[i]);
+    const val2 = parseInt(savVerArr?.[i]);
+    // prevent 0 from being devalued
+    const v1 = val1 >= 0 ? val1 : -1;
+    const v2 = val2 >= 0 ? val2 : -1;
+    // go to the next if they're the same
+    if (v1 === v2) continue;
+    // stop if one is higher
+    if (v1 > v2) return false;
+    if (v1 < v2) return true;
+  }
+
+  return true;
+};
+
+/**
  * Retrieves and displays the list of mods from local storage.
  * Clears the current mod list display and populates it with mod information.
  * Updates the display based on the presence of mods and their validity.
@@ -72,11 +106,7 @@ const displayMods = (modInput) => {
         parsedStoredMods.find((storedMod) => storedMod?.name === mod?.name) &&
         window.modBrowser;
       // check if the mod has the latest version
-      const hasLatestVersion =
-        parsedStoredMods.find(
-          // make sure name and version match
-          (storedMod) => storedMod?.version === mod?.version && storedMod?.name === mod?.name
-        ) && isOwned;
+      const hasLatestVersion = isOwned && checkLatestVersion(mod, parsedStoredMods);
 
       // create a list item
       const listItem = document.createElement("span");
@@ -206,8 +236,10 @@ const createRemoveButton = (mod, listItem) => {
             // add a download button
             const downloadButton = createDownloadButton(mod, listItem, false);
             listItem.appendChild(downloadButton);
-            // remove latest version indicator
+            // remove latest version 
+            listItem.querySelector(".list-item-text").firstChild.nodeValue = `${mod.name} ${mod.version} `;
             listItem.querySelector(".up-to-date-display").remove();
+            listItem.querySelector(".rainbow-action")?.remove();
             listItem.classList.toggle("owned");
             return;
           }
@@ -255,6 +287,8 @@ const createDownloadButton = (mod, listItem, listAsUpdate) => {
     if (!success) return;
     // update latest version indicator
     const updateAvailability = listItem.querySelector(".up-to-date-display");
+    listItem.querySelector(".list-item-text").firstChild.nodeValue = `${mod.name} ${mod.version} `;
+
     if (updateAvailability) {
       // update sync button
       updateAvailability.classList.remove("update-availability");

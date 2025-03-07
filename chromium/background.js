@@ -14,7 +14,18 @@ const CONSTANTS = {
   RELOAD_MODS: "RELOAD_MODS",
   PROCESS_IMAGES: "PROCESS_IMAGES",
   ERROR: "ERROR",
-};
+}
+
+
+/**
+ * Checks if the given URL is a valid URL to open in the browser.
+ *
+ * @param {string} url The URL to check.
+ * @returns {boolean} True if the URL is valid, false otherwise.
+ */
+const isValidURL = (url) =>
+  !url.startsWith("edge://") && !url.startsWith("chrome://") && !url.startsWith("about:");
+
 
 extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // getting constants
@@ -83,11 +94,14 @@ extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // get the mods to pass in
       const mods = await extension.storage.local.get(null);
       // script the current tab
-      await extension.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        function: reloadServiceWorkers,
-        args: [mods],
-      });
+      try {
+        if (isValidURL(tabs[0].url))
+          await extension.scripting.executeScript({
+            target: { tabId: tabs[0].id },
+            function: reloadServiceWorkers,
+            args: [mods],
+          });
+      } catch (error) { return sendResponse({ type: CONSTANTS.MODS_RELOADED }); }
       // then send the response
       sendResponse({ type: CONSTANTS.MODS_RELOADED });
     }).catch((error) => sendResponse({ type: CONSTANTS.ERROR, message: error.message }));
