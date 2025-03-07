@@ -74,7 +74,7 @@ const displayMods = (modInput) => {
       const hasLatestVersion =
         parsedStoredMods.find(
           (storedMod) => storedMod?.version === mod?.version
-        ) && window.modBrowser;
+        ) && isOwned;
 
       // create a list item
       const listItem = document.createElement("span");
