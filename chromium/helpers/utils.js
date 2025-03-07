@@ -71,9 +71,11 @@ const displayMods = (modInput) => {
       const isOwned =
         parsedStoredMods.find((storedMod) => storedMod?.name === mod?.name) &&
         window.modBrowser;
+      // check if the mod has the latest version
       const hasLatestVersion =
         parsedStoredMods.find(
-          (storedMod) => storedMod?.version === mod?.version
+          // make sure name and version match
+          (storedMod) => storedMod?.version === mod?.version && storedMod?.name === mod?.name
         ) && isOwned;
 
       // create a list item
@@ -84,10 +86,11 @@ const displayMods = (modInput) => {
 
       // create an element for the text
       const itemText = document.createElement("span");
+
       // nest version into another span for styling
       const itemVersion = document.createElement("span");
       itemVersion.classList.add("list-item-version");
-      itemVersion.innerHTML = `[${mod.gameAbbreviation} ${mod.gameVersion}]`;
+      itemVersion.innerHTML = `[${mod.gameAbbreviation} ${mod?.gameVersion}]`;
 
       // check if its outdated
       const game = currentGameVersions.find(
@@ -108,9 +111,20 @@ const displayMods = (modInput) => {
         }
       }
 
+      // set mod version to installed version where applicable
+      let modVersion = mod?.version;
+      if (window.modBrowser) {
+        const storedMod = parsedStoredMods.find(
+          (storedMod) => storedMod?.name === mod?.name
+        )
+        // use the installed variant
+        if (storedMod?.version)
+          modVersion = storedMod?.version
+      }
+
       // text content
       itemText.classList.add("list-item-text");
-      itemText.innerHTML = `${mod.name} ${mod.version} `;
+      itemText.innerHTML = `${mod.name} ${modVersion} `;
       // append the version
       itemText.appendChild(itemVersion);
       listItem.appendChild(itemText);
