@@ -3,6 +3,7 @@ const reloadModsButton = document.getElementById("reloadMods");
 const findModsButton = document.getElementById("findMods");
 let CONSTANTS;
 let currentGameVersions = [];
+window.apiBaseUrl = "https://levelsharesquare.com/api/accesspoint/"
 
 /**
  * Fetches the current game versions from the LSS API and updates the versions
@@ -10,13 +11,13 @@ let currentGameVersions = [];
  *
  * @return {undefined} - Does not return a value.
  */
-const getGameVer = async () => {
+const getGameVer = () => new Promise(async (resolve) => {
   const response = await fetch(
-    "https://levelsharesquare.com/api/accesspoint/gameversion/ALL"
+    window.apiBaseUrl + "gameversion/ALL"
   );
   currentGameVersions = (await response.json())?.version;
   const gameVerSpan = document.getElementById("game-ver-display");
-  if (!gameVerSpan) return;
+  if (!gameVerSpan) return resolve();
   // map all game versions
   currentGameVersions?.forEach((game) => {
     if (game.acronym === "SM127") return;
@@ -30,7 +31,9 @@ const getGameVer = async () => {
       "game_version_retrieval_error"
     );
   }
-};
+  // resolve the promise
+  resolve();
+});
 
 extension.runtime.sendMessage({ type: "GET_CONSTANTS" }, (response) => {
   CONSTANTS = response.CONSTANTS;
@@ -59,7 +62,9 @@ const displayMods = (modInput) => {
     while (modList.firstChild) {
       modList.removeChild(modList.firstChild);
     }
-    document.getElementById("empty").style.display = hasMods ? "none" : "block";
+    const emptyEl = document.getElementById("empty");
+    if (hasMods && !emptyEl.classList.contains("hidden")) emptyEl.classList.add("hidden");
+    if (!hasMods && emptyEl.classList.contains("hidden")) emptyEl.classList.remove("hidden");
     // loop over mods to turn them into elements
     mods.forEach((mod) => {
       // check if the user already owns the mod
@@ -196,7 +201,7 @@ const createRemoveButton = (mod, listItem) => {
           // remove the mod entry
           listItem.remove();
           if (document.getElementById("mod-list").children.length === 0) {
-            document.getElementById("empty").style.display = "block";
+            document.getElementById("empty").classList.remove("hidden");
           }
         }
       }
@@ -619,8 +624,7 @@ const handleModLoad = async (input) => {
       let fileInput = input;
       if (input.target) fileInput = document.getElementById("uploadModFolder");
 
-      console.log(fileInput, fileInput.files);
-
+      // check if the user has selected a folder
       if (!fileInput.files.length) {
         resolve();
         alert(extension.i18n.getMessage("empty_folder_error"));

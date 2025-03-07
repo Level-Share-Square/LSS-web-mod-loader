@@ -82,6 +82,33 @@ body::after {
   }
 }
 
+::-webkit-scrollbar-track,
+::-webkit-scrollbar {
+  background: linear-gradient(
+    15deg,
+    rgb(28, 31, 116),
+    rgb(16, 127, 131)
+  ) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    38deg,
+    rgb(77, 126, 206),
+    rgb(109, 169, 209)
+  ) !important;
+  border-radius: 14px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    38deg,
+    rgb(234, 106, 187),
+    rgb(212, 163, 56)
+  ) !important;
+  border-radius: 14px !important;
+}
+
 #mod-list:has(> .list-item) {
   width: 100%;
   overflow-y: auto;
