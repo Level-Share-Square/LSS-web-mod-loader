@@ -13,6 +13,12 @@
   ],
   "default_locale": "en",
   "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["pages/main/page.html"],
+      "matches": ["chrome-extension://*/*"]
+    }
+  ],
   "icons": {
     "16": "assets/icons/icon-16.png",
     "48": "assets/icons/icon-48.png",
